@@ -7,9 +7,9 @@ on:
 
 env:
   AWS_REGION: ap-northeast-2
-  S3_BUCKET_NAME: vs-dp-github-action-s3-bucket
-  CODE_DEPLOY_APPLICATION_NAME: vs-dp-codedeploy-ai-model-showcase-backend
-  CODE_DEPLOY_DEPLOYMENT_GROUP_NAME: vs-dp-codedeploy-ai-model-showcase-backend-deployment-group
+  S3_BUCKET_NAME: vs-ai-model-showcase-bucket
+  CODE_DEPLOY_APPLICATION_NAME: vs-ai-model-showcase-codedeploy-app
+  CODE_DEPLOY_DEPLOYMENT_GROUP_NAME: vs-ai-model-showcase-codedeploy-app-deployment-group
 
 permissions:
   contents: read
