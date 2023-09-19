@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-PROJECT_ROOT="/home/ubuntu/deploy/ai-model-showcase-backend"
+PROJECT_ROOT="/home/ubuntu/app/ai-model-showcase-backend"
 JAR_FILE="$PROJECT_ROOT/ai-model-showcase-webapp.jar"
 
 APP_LOG="$PROJECT_ROOT/application.log"

@@ -2,10 +2,10 @@ version: 0.0
 os: linux # Ubuntu니까 linux로 설정.
 files:
   - source: /
-    destination: /home/ubuntu/deploy/ai_model_showcase_backend # EC2 인스턴스 안에 프로젝트를 저장할 경로.
+    destination: /home/ubuntu/app/ai-model-showcase-backend # EC2 인스턴스 안에 프로젝트를 저장할 경로.
     overwrite: yes
 permissions: # EC2 인스턴스에 프로젝트를 저장하기 위한 권한 설정.
-  - object: /home/ubuntu/deploy/ai_model_showcase_backend # EC2 인스턴스 안에 프로젝트를 저장할 경로.
+  - object: /home/ubuntu/app/ai-model-showcase-backend # EC2 인스턴스 안에 프로젝트를 저장할 경로.
     owner: root
     group: root
     mode: 755
