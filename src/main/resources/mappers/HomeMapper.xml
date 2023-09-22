@@ -3,7 +3,7 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
-<mapper namespace="visang.showcase.aibackend.mapper.QuestionBankMapper">
+<mapper namespace="visang.showcase.aibackend.mapper.HomeMapper">
     <!-- 문제은행 : SELECT 테스트 -->
     <select id="getQuestionExample" resultType="String" fetchSize="1000">
         select procedure_code

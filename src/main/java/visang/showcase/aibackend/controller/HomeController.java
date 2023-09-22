@@ -5,16 +5,16 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import visang.showcase.aibackend.service.QuestionBankService;
+import visang.showcase.aibackend.service.HomeService;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("questionbank")
-public class QuestionBankController {
+@RequestMapping("home")
+public class HomeController {
 
-    private final QuestionBankService questionBankService;
+    private final HomeService questionBankService;
 
-    @GetMapping("example")
+    @GetMapping("test")
     public ResponseEntity<String> getQuestionExample() {
         return ResponseEntity.ok(questionBankService.getQuestionExample());
     }
