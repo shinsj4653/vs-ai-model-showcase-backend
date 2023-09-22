@@ -6,6 +6,6 @@ import visang.showcase.aibackend.dto.response.member.MemberQueryDto;
 import java.util.List;
 
 @Mapper
-public class MemberMapper {
-    List<MemberQueryDto> getMembers;
+public interface MemberMapper {
+    List<MemberQueryDto> getMembers();
 }
