@@ -5,9 +5,9 @@
 
 <mapper namespace="visang.showcase.aibackend.mapper.HomeMapper">
     <!-- 문제은행 : SELECT 테스트 -->
-    <select id="getQuestionExample" resultType="String" fetchSize="1000">
-        select procedure_code
-        from ai_inference_model.tb_question
-        where question_id = 0;
+    <select id="getTopicName" resultType="String" fetchSize="1000">
+        select topic_nm
+        from ai_model_showcase.tb_topic_info
+        where q_idx = 0;
     </select>
 </mapper>

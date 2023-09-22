@@ -12,7 +12,7 @@ public class HomeService {
 
     private final HomeMapper homeMapper;
 
-    public String getQuestionExample() {
-        return homeMapper.getQuestionExample();
+    public String getTopicName() {
+        return homeMapper.getTopicName();
     }
 }

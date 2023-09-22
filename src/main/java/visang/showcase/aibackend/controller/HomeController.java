@@ -5,6 +5,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import visang.showcase.aibackend.dto.response.common.ResponseDto;
+import visang.showcase.aibackend.dto.response.common.ResponseUtil;
 import visang.showcase.aibackend.service.HomeService;
 
 @RestController
@@ -12,10 +14,10 @@ import visang.showcase.aibackend.service.HomeService;
 @RequestMapping("home")
 public class HomeController {
 
-    private final HomeService questionBankService;
+    private final HomeService homeService;
 
     @GetMapping("test")
-    public ResponseEntity<String> getQuestionExample() {
-        return ResponseEntity.ok(questionBankService.getQuestionExample());
+    public ResponseDto<String> getQuestionExample() {
+        return ResponseUtil.SUCCESS("테스트", homeService.getTopicName());
     }
 }
