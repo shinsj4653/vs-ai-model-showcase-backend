@@ -1,4 +1,4 @@
-package visang.showcase.aibackend.dto.request;
+package visang.showcase.aibackend.dto.request.member;
 
 public class MemberNoRequest {
     private String memberNo;
