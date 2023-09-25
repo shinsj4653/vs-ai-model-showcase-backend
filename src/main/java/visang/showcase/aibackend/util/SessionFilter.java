@@ -8,6 +8,7 @@ import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.annotation.WebFilter;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import java.io.IOException;
 
@@ -23,12 +24,18 @@ public class SessionFilter implements Filter {
             throws IOException, ServletException {
         System.out.println("session start!!");
         HttpServletRequest httpRequest = (HttpServletRequest) request;
+        HttpServletResponse httpResponse = (HttpServletResponse) response;
         HttpSession session = httpRequest.getSession(true); // 세션이 없으면 새로 생성
         String requestUri = httpRequest.getRequestURI();
 
         // 세션에 memberNo 값이 없는 경우에 대한 처리 필요.
         if (!requestUri.startsWith("/members")
                 && (session.getAttribute("memberNo") == null)) {
+
+            // Redirect to the root IP address
+            httpResponse.sendRedirect("/"); // Change this to your desired root URL
+            System.out.println("redirect to first page!!");
+            return;
 
         } else {
             // 세션이 존재하고 "username" 속성이 있는 경우, 정상적인 처리
