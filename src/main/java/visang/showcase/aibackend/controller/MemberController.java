@@ -23,7 +23,7 @@ public class MemberController {
     }
 
     @PostMapping("/setMemberNo")
-    public ResponseDto<Integer> setMemberNo(@RequestBody MemberNoRequest memberNoRequest, HttpServletRequest request) {
+    public ResponseDto<String> setMemberNo(@RequestBody MemberNoRequest memberNoRequest, HttpServletRequest request) {
         return ResponseUtil.SUCCESS("학생번호 선택 완료.", memberService.setMemberNo(memberNoRequest, request));
     }
 }
