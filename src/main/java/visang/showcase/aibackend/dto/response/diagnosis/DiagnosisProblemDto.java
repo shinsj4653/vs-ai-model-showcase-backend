@@ -13,4 +13,5 @@ public class DiagnosisProblemDto {
     private String chapter_nm; // 대단원 한글명
     private String section_nm; // 중단원 한글명
     private String subsection_nm; // 소단원 한글명
+    private String imgpath; // 문제 이미지 url
 }
