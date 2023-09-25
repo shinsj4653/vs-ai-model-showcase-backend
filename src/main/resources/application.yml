@@ -12,3 +12,9 @@ mybatis: # type을 쉽게 쓰기 위해서 dto 패키지를 type-aliaes에 설�
   mapper-locations: /mappers/**/*.xml
   type-aliases-package: visang.showcase.aibackend.dto
   config-location: classpath:mybatis/mybatis-config.xml
+
+# 세션 타임아웃 설정
+server:
+  servlet:
+    session:
+      timeout: 1800
