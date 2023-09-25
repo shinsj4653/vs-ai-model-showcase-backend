@@ -1,4 +1,4 @@
-package visang.showcase.aibackend.dto.response.member;
+package visang.showcase.aibackend.dto.response.diagnosis;
 
 import lombok.Getter;
 
