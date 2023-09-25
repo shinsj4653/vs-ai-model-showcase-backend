@@ -1,13 +1,13 @@
 package visang.showcase.aibackend.dto.request;
 
 public class MemberNoRequest {
-    private int memberNo;
+    private String memberNo;
 
-    public int getMemberNo() {
+    public String getMemberNo() {
         return memberNo;
     }
 
-    public void setMemberNo(int memberNo) {
+    public void setMemberNo(String memberNo) {
         this.memberNo = memberNo;
     }
 }

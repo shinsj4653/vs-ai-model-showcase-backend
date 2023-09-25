@@ -26,9 +26,9 @@ public class MemberService {
                 .collect(Collectors.toList());
     }
 
-    public Integer setMemberNo(MemberNoRequest memberNoRequest, HttpServletRequest request) {
+    public String setMemberNo(MemberNoRequest memberNoRequest, HttpServletRequest request) {
         // 프론트엔드에서 전달한 member_no 값을 가져옴
-        int memberNo = memberNoRequest.getMemberNo();
+        String memberNo = memberNoRequest.getMemberNo();
 
         // 세션을 얻어와서 member_no 값을 세션에 저장
         HttpSession session = request.getSession();

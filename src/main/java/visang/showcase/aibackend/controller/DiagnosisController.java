@@ -18,10 +18,9 @@ import java.util.List;
 public class DiagnosisController {
 
     private final DiagnosisService diagnosisService;
-    @GetMapping
+    @GetMapping("getProblems")
     public ResponseDto<List<DiagnosisProblemDto>> getProblems(HttpSession session) {
         String memberNo = (String) session.getAttribute("memberNo");
-        
         // memberNo 값이 세션에 존재할 경우에만 서비스단 로직 수행
         if (memberNo != null) {
             List<DiagnosisProblemDto> problems = diagnosisService.getProblems(memberNo);
