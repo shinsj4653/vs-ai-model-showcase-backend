@@ -29,7 +29,8 @@ public class SessionFilter implements Filter {
         String requestUri = httpRequest.getRequestURI();
 
         // 세션에 memberNo 값이 없는 경우에 대한 처리 필요.
-        if (!requestUri.startsWith("/members")
+        if (!requestUri.startsWith("/members") &&
+                !requestUri.equals("/")
                 && (session.getAttribute("memberNo") == null)) {
 
             // Redirect to the root IP address
