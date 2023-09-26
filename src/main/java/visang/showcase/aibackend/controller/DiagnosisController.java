@@ -30,9 +30,9 @@ public class DiagnosisController {
         }
     }
 
-    @PostMapping("dashboard")
-    public ResponseDto<List<DiagnosisProblemDto>> getDashboardResult(@RequestBody DashboardRequest request) {
-        
-    }
+//    @PostMapping("dashboard")
+//    public ResponseDto<List<DiagnosisProblemDto>> getDashboardResult(@RequestBody DashboardRequest request) {
+//
+//    }
 
 }
