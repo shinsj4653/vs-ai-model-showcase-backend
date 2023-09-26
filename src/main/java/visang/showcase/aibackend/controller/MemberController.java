@@ -2,7 +2,7 @@ package visang.showcase.aibackend.controller;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
-import visang.showcase.aibackend.dto.request.MemberNoRequest;
+import visang.showcase.aibackend.dto.request.member.MemberNoRequest;
 import visang.showcase.aibackend.dto.response.common.ResponseDto;
 import visang.showcase.aibackend.dto.response.common.ResponseUtil;
 import visang.showcase.aibackend.dto.response.member.MemberDto;
