@@ -20,7 +20,9 @@ public class DiagnosisService {
     private final DiagnosisMapper diagnosisMapper;
 
     public List<DiagnosisProblemDto> getProblems(String memberNo) {
-        return diagnosisMapper.getProblems(memberNo);
+
+        // 끝부분 15개의 문항만 클라이언트로 반환
+        return diagnosisMapper.getProblems(memberNo).subList(85 , 100);
     }
 
 //    public List<String, Object> getDashBoardResult() {

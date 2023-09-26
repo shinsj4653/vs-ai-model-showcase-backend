@@ -6,7 +6,7 @@
 <mapper namespace="visang.showcase.aibackend.mapper.DiagnosisMapper">
     <!-- GET /diagnosis/getProblems -->
     <select id="getProblems" resultType="DiagnosisProblemDto" fetchSize="1000">
-        select tti.q_idx, tpsr.prob_solve_idx, tpsr.diff_level, tpsr.correct, tpsr.prob_no, tpsr.prob_seq_no, tti.topic_nm, tti.chapter_nm, tti.section_nm, tti.subsection_nm, tpi.imgpath
+        select tti.q_idx, tpsr.prob_solve_idx, tpsr.diff_level, tpsr.correct, tpsr.prob_no, tpsr.prob_seq_no, tti.topic_nm, tti.categ_nm, tti.chapter_nm, tti.section_nm, tti.subsection_nm, tpi.imgpath
         from ai_model_showcase.tb_member_info tmi
         join ai_model_showcase.tb_prob_solve_result tpsr on tmi.member_no = tpsr.member_no
         join ai_model_showcase.tb_prob_info tpi on tpsr.prob_no = tpi.prob_no
