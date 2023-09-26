@@ -11,6 +11,7 @@ import visang.showcase.aibackend.dto.response.diagnosis.dashboard.DiffLevelCorre
 import visang.showcase.aibackend.dto.response.diagnosis.dashboard.TopicCorrectRate;
 import visang.showcase.aibackend.dto.response.diagnosis.dashboard.WholeCorrectRate;
 import visang.showcase.aibackend.mapper.DiagnosisMapper;
+import visang.showcase.aibackend.vo.CorrectCounter;
 
 import java.util.HashMap;
 import java.util.List;
@@ -21,7 +22,6 @@ import java.util.stream.Collectors;
 @Service
 @RequiredArgsConstructor
 public class DiagnosisService {
-
     private static final String CORRECT_ANSWER_KEY = "yes";
     private static final String WRONG_ANSWER_KEY = "no";
 
@@ -61,8 +61,8 @@ public class DiagnosisService {
         }
 
         int total = resultRequest.getProb_list().size();
-        int correct = correctRecords.get(CORRECT_ANSWER_KEY);
-        int wrong = correctRecords.get(WRONG_ANSWER_KEY);
+        int correct = correctRecords.getOrDefault(CORRECT_ANSWER_KEY, 0);
+        int wrong = correctRecords.getOrDefault(WRONG_ANSWER_KEY, 0);
 
         return new WholeCorrectRate(total, correct, wrong);
     }
@@ -80,10 +80,14 @@ public class DiagnosisService {
             int diff_level = prob.getDiff_level();
             int correct = prob.getCorrect();
 
+            if (!diffLevelRecords.containsKey(diff_level)) {
+                diffLevelRecords.put(diff_level, new CorrectCounter());
+            }
+
             if (correct == 0) { // 오답 count
-                diffLevelRecords.getOrDefault(diff_level, new CorrectCounter()).wrongCountUp();
+                diffLevelRecords.get(diff_level).wrongCountUp();
             } else { // 정답 count
-                diffLevelRecords.getOrDefault(diff_level, new CorrectCounter()).correctCountUp();
+                diffLevelRecords.get(diff_level).correctCountUp();
             }
         }
 
@@ -92,6 +96,7 @@ public class DiagnosisService {
                 .map(entry -> {
                     int diff_level = entry.getKey();
                     CorrectCounter counter = entry.getValue();
+                    System.out.println("diff_level: " + diff_level + ", correct: " + counter.getCorrectCount() + ", wrong: " + counter.getWrongCount());
                     return new DiffLevelCorrectRate(diff_level, counter.getCorrectCount(), counter.getWrongCount());
                 })
                 .collect(Collectors.toList());
@@ -112,15 +117,19 @@ public class DiagnosisService {
             int correct = prob.getCorrect();
             String topic_nm = prob.getTopic_nm();
 
+            if (!topicRecords.containsKey(q_idx)) {
+                topicRecords.put(q_idx, new CorrectCounter());
+            }
+
             // q_idx와 topic_nm 매핑
             if (!topicNames.containsKey(q_idx)) {
                 topicNames.put(q_idx, topic_nm);
             }
 
             if (correct == 0) { // 오답 count
-                topicRecords.getOrDefault(q_idx, new CorrectCounter()).wrongCountUp();
+                topicRecords.get(q_idx).wrongCountUp();
             } else { // 정답 count
-                topicRecords.getOrDefault(q_idx, new CorrectCounter()).correctCountUp();
+                topicRecords.get(q_idx).correctCountUp();
             }
         }
 

@@ -7,6 +7,7 @@ import visang.showcase.aibackend.dto.response.common.ResponseDto;
 import visang.showcase.aibackend.dto.response.common.ResponseUtil;
 import visang.showcase.aibackend.dto.response.diagnosis.DiagnosisProblemDto;
 import visang.showcase.aibackend.dto.response.diagnosis.DiagnosisResultDto;
+import visang.showcase.aibackend.dto.response.diagnosis.dashboard.DiagnosisDashboardResultDto;
 import visang.showcase.aibackend.dto.response.diagnosis.dashboard.DiffLevelCorrectRate;
 import visang.showcase.aibackend.dto.response.diagnosis.dashboard.TopicCorrectRate;
 import visang.showcase.aibackend.dto.response.diagnosis.dashboard.WholeCorrectRate;
@@ -40,13 +41,20 @@ public class DiagnosisController {
         return ResponseUtil.SUCCESS("학생의 진단평가 결과 조회 성공", result);
     }
 
+    /**
+     * 트리톤 서버에서 받은 데이터와 조합하여 응답해야 함
+     * Map<String, Object> 형식으로 반환 예정
+     * 테스트를 위해 임시로 DiagnosisDashboardResultDto를 사용
+     */
     @PostMapping("dashboard")
-    public ResponseDto<DiagnosisResultDto> getDiagnosisDashboardResult(@RequestBody DiagnosisResultRequest resultRequest) {
+    public ResponseDto<DiagnosisDashboardResultDto> getDiagnosisDashboardResult(@RequestBody DiagnosisResultRequest resultRequest) {
 
         WholeCorrectRate wholeCorrectRate = diagnosisService.calculateWholeCorrectRate(resultRequest);
         List<DiffLevelCorrectRate> diffLevelCorrectRates = diagnosisService.calculateDiffLevelCorrectRates(resultRequest);
         List<TopicCorrectRate> topicCorrectRates = diagnosisService.calculateTopicCorrectRates(resultRequest);
 
-        return null;
+        DiagnosisDashboardResultDto result = new DiagnosisDashboardResultDto(wholeCorrectRate, diffLevelCorrectRates, topicCorrectRates);
+
+        return ResponseUtil.SUCCESS("진단평가 대시보드 데이터 조회 성공", result);
     }
 }

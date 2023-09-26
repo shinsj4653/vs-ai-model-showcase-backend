@@ -6,7 +6,8 @@
 <mapper namespace="visang.showcase.aibackend.mapper.DiagnosisMapper">
     <!-- GET /diagnosis/getProblems -->
     <select id="getProblems" resultType="DiagnosisProblemDto" fetchSize="1000">
-        select tpsr.prob_solve_idx,
+        select tpsr.q_idx,
+               tpsr.prob_solve_idx,
                tpsr.diff_level,
                tpsr.correct,
                tpsr.prob_no,

@@ -5,8 +5,8 @@ import lombok.Getter;
 @Getter
 public class TopicCorrectRate {
     private String topic_name;
-    private int correct_answers;
-    private int incorrect_answers;
+    private Integer correct_answers;
+    private Integer incorrect_answers;
 
     public TopicCorrectRate(String topic_name, int correct_answers, int incorrect_answers) {
         this.topic_name = topic_name;

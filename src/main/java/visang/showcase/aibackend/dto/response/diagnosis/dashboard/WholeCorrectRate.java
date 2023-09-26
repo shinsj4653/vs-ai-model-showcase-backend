@@ -4,9 +4,9 @@ import lombok.Getter;
 
 @Getter
 public class WholeCorrectRate {
-    private int total_questions;
-    private int correct_answers;
-    private int incorrect_answers;
+    private Integer total_questions;
+    private Integer correct_answers;
+    private Integer incorrect_answers;
 
     public WholeCorrectRate(int total_questions, int correct_answers, int incorrect_answers) {
         this.total_questions = total_questions;
