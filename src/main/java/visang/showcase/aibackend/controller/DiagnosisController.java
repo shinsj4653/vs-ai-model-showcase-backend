@@ -2,7 +2,7 @@ package visang.showcase.aibackend.controller;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
-import visang.showcase.aibackend.dto.request.diagnosis.DiagnosisResultRequest;
+import visang.showcase.aibackend.dto.request.diagnosis.DashboardRequest;
 import visang.showcase.aibackend.dto.response.common.ResponseDto;
 import visang.showcase.aibackend.dto.response.common.ResponseUtil;
 import visang.showcase.aibackend.dto.response.diagnosis.DiagnosisProblemDto;
@@ -30,14 +30,9 @@ public class DiagnosisController {
         }
     }
 
-    @PostMapping("sendResult")
-    public ResponseDto<List<DiagnosisResultDto>> sendResult(@RequestBody DiagnosisResultRequest resultRequest) {
-        List<DiagnosisResultDto> result = diagnosisService.sendResult(resultRequest);
-        return ResponseUtil.SUCCESS("학생의 진단평가 결과 조회 성공", result);
-    }
-    @GetMapping("dashboard")
-    public ResponseDto<List<DiagnosisProblemDto>> getDashboardResult() {
-
+    @PostMapping("dashboard")
+    public ResponseDto<List<DiagnosisProblemDto>> getDashboardResult(@RequestBody DashboardRequest request) {
+        
     }
 
 }

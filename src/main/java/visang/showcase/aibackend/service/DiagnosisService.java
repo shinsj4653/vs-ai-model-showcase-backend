@@ -3,9 +3,7 @@ package visang.showcase.aibackend.service;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import visang.showcase.aibackend.dto.request.diagnosis.DiagnosisResultRequest;
+import visang.showcase.aibackend.dto.request.diagnosis.DashboardRequest;
 import visang.showcase.aibackend.dto.response.diagnosis.DiagnosisProblemDto;
 import visang.showcase.aibackend.dto.response.diagnosis.DiagnosisResultDto;
 import visang.showcase.aibackend.dto.response.diagnosis.DiagnosisResultQueryDto;
@@ -25,7 +23,7 @@ public class DiagnosisService {
         return diagnosisMapper.getProblems(memberNo);
     }
 
-    public List<DiagnosisResultDto> sendResult(DiagnosisResultRequest request) {
+    public List<DiagnosisResultDto> sendResult(DashboardRequest request) {
 
         List<DiagnosisProblemDto> list = request.getProb_list();
 
