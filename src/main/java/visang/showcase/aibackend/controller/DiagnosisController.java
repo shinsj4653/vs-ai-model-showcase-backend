@@ -7,6 +7,7 @@ import visang.showcase.aibackend.dto.response.common.ResponseDto;
 import visang.showcase.aibackend.dto.response.common.ResponseUtil;
 import visang.showcase.aibackend.dto.response.diagnosis.DiagnosisProblemDto;
 import visang.showcase.aibackend.dto.response.diagnosis.DiagnosisResultDto;
+import visang.showcase.aibackend.dto.response.diagnosis.dashboard.WholeCorrectRate;
 import visang.showcase.aibackend.service.DiagnosisService;
 
 import javax.servlet.http.HttpSession;
@@ -35,5 +36,14 @@ public class DiagnosisController {
     public ResponseDto<List<DiagnosisResultDto>> sendResult(@RequestBody DiagnosisResultRequest resultRequest) {
         List<DiagnosisResultDto> result = diagnosisService.sendResult(resultRequest);
         return ResponseUtil.SUCCESS("학생의 진단평가 결과 조회 성공", result);
+    }
+
+    @PostMapping("dashboard")
+    public ResponseDto<DiagnosisResultDto> getDiagnosisDashboardResult(@RequestBody DiagnosisResultRequest resultRequest) {
+
+        WholeCorrectRate wholeCorrectRate = diagnosisService.calculateWholeCorrectRate(resultRequest);
+//        List<TopicCorrectRate> topicCorrectRates = diagnosisService.calculateTopicCorrectRates(resultRequest);
+
+        return null;
     }
 }
