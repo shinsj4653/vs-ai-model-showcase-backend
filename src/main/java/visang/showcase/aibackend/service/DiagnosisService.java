@@ -7,6 +7,7 @@ import visang.showcase.aibackend.dto.request.diagnosis.DiagnosisResultRequest;
 import visang.showcase.aibackend.dto.response.diagnosis.DiagnosisProblemDto;
 import visang.showcase.aibackend.dto.response.diagnosis.DiagnosisResultDto;
 import visang.showcase.aibackend.dto.response.diagnosis.DiagnosisResultQueryDto;
+import visang.showcase.aibackend.dto.response.diagnosis.dashboard.DiffLevelCorrectRate;
 import visang.showcase.aibackend.dto.response.diagnosis.dashboard.TopicCorrectRate;
 import visang.showcase.aibackend.dto.response.diagnosis.dashboard.WholeCorrectRate;
 import visang.showcase.aibackend.mapper.DiagnosisMapper;
@@ -58,9 +59,9 @@ public class DiagnosisService {
         for (DiagnosisProblemDto prob : resultRequest.getProb_list()) {
             int correct = prob.getCorrect();
             if (correct == 0) { // 오답 count
-                correctRecords.put(CORRECT_ANSWER_KEY, correctRecords.getOrDefault(CORRECT_ANSWER_KEY, 0) + 1);
-            } else { // 정답 count
                 correctRecords.put(WRONG_ANSWER_KEY, correctRecords.getOrDefault(WRONG_ANSWER_KEY, 0) + 1);
+            } else { // 정답 count
+                correctRecords.put(CORRECT_ANSWER_KEY, correctRecords.getOrDefault(CORRECT_ANSWER_KEY, 0) + 1);
             }
         }
 
@@ -69,6 +70,36 @@ public class DiagnosisService {
         int wrong = correctRecords.get(WRONG_ANSWER_KEY);
 
         return new WholeCorrectRate(total, correct, wrong);
+    }
+
+    /**
+     * 난이도별 정답률 계산
+     *
+     * @param resultRequest 진단평가 결과 데이터
+     * @return List<DiffLevelCorrectRate> 반환
+     */
+    public List<DiffLevelCorrectRate> calculateDiffLevelCorrectRates(DiagnosisResultRequest resultRequest) {
+        Map<Integer, CorrectCounter> diffLevelRecords = new HashMap<>();
+
+        for (DiagnosisProblemDto prob : resultRequest.getProb_list()) {
+            int diff_level = prob.getDiff_level();
+            int correct = prob.getCorrect();
+
+            if (correct == 0) { // 오답 count
+                diffLevelRecords.getOrDefault(diff_level, new CorrectCounter()).wrongCountUp();
+            } else { // 정답 count
+                diffLevelRecords.getOrDefault(diff_level, new CorrectCounter()).correctCountUp();
+            }
+        }
+
+        return diffLevelRecords.entrySet()
+                .stream()
+                .map(entry -> {
+                    int diff_level = entry.getKey();
+                    CorrectCounter counter = entry.getValue();
+                    return new DiffLevelCorrectRate(diff_level, counter.getCorrectCount(), counter.getWrongCount());
+                })
+                .collect(Collectors.toList());
     }
 
     /**
