@@ -80,9 +80,7 @@ public class DiagnosisService {
             int diff_level = prob.getDiff_level();
             int correct = prob.getCorrect();
 
-            if (!diffLevelRecords.containsKey(diff_level)) {
-                diffLevelRecords.put(diff_level, new CorrectCounter());
-            }
+            diffLevelRecords.putIfAbsent(diff_level, new CorrectCounter());
 
             if (correct == 0) { // 오답 count
                 diffLevelRecords.get(diff_level).wrongCountUp();
@@ -96,7 +94,6 @@ public class DiagnosisService {
                 .map(entry -> {
                     int diff_level = entry.getKey();
                     CorrectCounter counter = entry.getValue();
-                    System.out.println("diff_level: " + diff_level + ", correct: " + counter.getCorrectCount() + ", wrong: " + counter.getWrongCount());
                     return new DiffLevelCorrectRate(diff_level, counter.getCorrectCount(), counter.getWrongCount());
                 })
                 .collect(Collectors.toList());
@@ -117,14 +114,9 @@ public class DiagnosisService {
             int correct = prob.getCorrect();
             String topic_nm = prob.getTopic_nm();
 
-            if (!topicRecords.containsKey(q_idx)) {
-                topicRecords.put(q_idx, new CorrectCounter());
-            }
-
             // q_idx와 topic_nm 매핑
-            if (!topicNames.containsKey(q_idx)) {
-                topicNames.put(q_idx, topic_nm);
-            }
+            topicNames.putIfAbsent(q_idx, topic_nm);
+            topicRecords.putIfAbsent(q_idx, new CorrectCounter());
 
             if (correct == 0) { // 오답 count
                 topicRecords.get(q_idx).wrongCountUp();

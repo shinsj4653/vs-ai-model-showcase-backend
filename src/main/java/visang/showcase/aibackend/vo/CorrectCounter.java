@@ -4,8 +4,8 @@ import lombok.Getter;
 
 @Getter
 public class CorrectCounter {
-    Integer correctCount;
-    Integer wrongCount;
+    private Integer correctCount;
+    private Integer wrongCount;
 
     public CorrectCounter() {
         correctCount = 0;
