@@ -2,6 +2,8 @@ package visang.showcase.aibackend.dto.response.diagnosis.dashboard;
 
 import lombok.Getter;
 
+// 최종결과는 Map<String, Object> 형태로 반환할 예정
+// (deprecated)
 @Getter
 public class DiagnosisDashboardResultDto {
     private int total_questions;

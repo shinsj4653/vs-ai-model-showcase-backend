@@ -7,6 +7,7 @@ import visang.showcase.aibackend.dto.request.diagnosis.DiagnosisResultRequest;
 import visang.showcase.aibackend.dto.response.diagnosis.DiagnosisProblemDto;
 import visang.showcase.aibackend.dto.response.diagnosis.DiagnosisResultDto;
 import visang.showcase.aibackend.dto.response.diagnosis.DiagnosisResultQueryDto;
+import visang.showcase.aibackend.dto.response.diagnosis.dashboard.TopicCorrectRate;
 import visang.showcase.aibackend.dto.response.diagnosis.dashboard.WholeCorrectRate;
 import visang.showcase.aibackend.mapper.DiagnosisMapper;
 
@@ -68,5 +69,42 @@ public class DiagnosisService {
         int wrong = correctRecords.get(WRONG_ANSWER_KEY);
 
         return new WholeCorrectRate(total, correct, wrong);
+    }
+
+    /**
+     * 토픽별 정답률 계산
+     *
+     * @param resultRequest 진단평가 결과 데이터
+     * @return List<TopicCorrectRate> 반환
+     */
+    public List<TopicCorrectRate> calculateTopicCorrectRates(DiagnosisResultRequest resultRequest) {
+        Map<Integer, CorrectCounter> topicRecords = new HashMap<>();
+        Map<Integer, String> topicNames = new HashMap<>();
+
+        for (DiagnosisProblemDto prob : resultRequest.getProb_list()) {
+            int q_idx = prob.getQ_idx();
+            int correct = prob.getCorrect();
+            String topic_nm = prob.getTopic_nm();
+
+            // q_idx와 topic_nm 매핑
+            if (!topicNames.containsKey(q_idx)) {
+                topicNames.put(q_idx, topic_nm);
+            }
+
+            if (correct == 0) { // 오답 count
+                topicRecords.getOrDefault(q_idx, new CorrectCounter()).wrongCountUp();
+            } else { // 정답 count
+                topicRecords.getOrDefault(q_idx, new CorrectCounter()).correctCountUp();
+            }
+        }
+
+        return topicRecords.entrySet()
+                .stream()
+                .map(entry -> {
+                    int q_idx = entry.getKey();
+                    CorrectCounter counter = entry.getValue();
+                    return new TopicCorrectRate(topicNames.get(q_idx), counter.getCorrectCount(), counter.getWrongCount());
+                })
+                .collect(Collectors.toList());
     }
 }

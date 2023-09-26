@@ -7,6 +7,7 @@ import visang.showcase.aibackend.dto.response.common.ResponseDto;
 import visang.showcase.aibackend.dto.response.common.ResponseUtil;
 import visang.showcase.aibackend.dto.response.diagnosis.DiagnosisProblemDto;
 import visang.showcase.aibackend.dto.response.diagnosis.DiagnosisResultDto;
+import visang.showcase.aibackend.dto.response.diagnosis.dashboard.TopicCorrectRate;
 import visang.showcase.aibackend.dto.response.diagnosis.dashboard.WholeCorrectRate;
 import visang.showcase.aibackend.service.DiagnosisService;
 
@@ -42,7 +43,8 @@ public class DiagnosisController {
     public ResponseDto<DiagnosisResultDto> getDiagnosisDashboardResult(@RequestBody DiagnosisResultRequest resultRequest) {
 
         WholeCorrectRate wholeCorrectRate = diagnosisService.calculateWholeCorrectRate(resultRequest);
-//        List<TopicCorrectRate> topicCorrectRates = diagnosisService.calculateTopicCorrectRates(resultRequest);
+//        List<DiffLevelCorrectRate> diffLevelCorrectRates = diagnosisService.calculateDiffLevelCorrectRates(resultRequest);
+        List<TopicCorrectRate> topicCorrectRates = diagnosisService.calculateTopicCorrectRates(resultRequest);
 
         return null;
     }
