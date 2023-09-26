@@ -25,7 +25,7 @@ public class DiagnosisService {
         return diagnosisMapper.getProblems(memberNo).subList(85 , 100);
     }
 
-//    public List<String, Object> getDashBoardResult() {
-//
-//    }
+    public List<String, Object> getDashBoardResult() {
+
+    }
 }
