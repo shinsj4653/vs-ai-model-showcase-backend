@@ -12,4 +12,6 @@ public interface DiagnosisMapper {
     List<DiagnosisProblemDto> getProblems(@Param("memberNo") String memberNo);
 
     DiagnosisResultQueryDto sendResult(@Param("probSolveIdx") Integer probSolveIdx);
+
+    List<Integer> getQIdxWithCategory(@Param("categ_nm") String categoryName);
 }

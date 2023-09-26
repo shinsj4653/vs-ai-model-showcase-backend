@@ -8,7 +8,6 @@ import visang.showcase.aibackend.dto.request.diagnosis.DashboardRequest;
 import visang.showcase.aibackend.dto.request.triton.KnowledgeLevelRequest;
 import visang.showcase.aibackend.dto.request.triton.KnowledgeReqObject;
 import visang.showcase.aibackend.dto.response.diagnosis.DashboardDto;
-import visang.showcase.aibackend.dto.request.diagnosis.DiagnosisResultRequest;
 import visang.showcase.aibackend.dto.response.diagnosis.DiagnosisProblemDto;
 import visang.showcase.aibackend.dto.response.triton.KnowledgeLevelResponse;
 import visang.showcase.aibackend.dto.response.diagnosis.DiagnosisResultDto;
@@ -16,14 +15,11 @@ import visang.showcase.aibackend.dto.response.diagnosis.DiagnosisResultQueryDto;
 import visang.showcase.aibackend.dto.response.diagnosis.dashboard.DiffLevelCorrectRate;
 import visang.showcase.aibackend.dto.response.diagnosis.dashboard.TopicCorrectRate;
 import visang.showcase.aibackend.dto.response.diagnosis.dashboard.WholeCorrectRate;
+import visang.showcase.aibackend.dto.response.triton.KnowledgeResObject;
 import visang.showcase.aibackend.mapper.DiagnosisMapper;
 import visang.showcase.aibackend.vo.CorrectCounter;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -42,7 +38,7 @@ public class DiagnosisService {
         return diagnosisMapper.getProblems(memberNo).subList(85 , 100);
     }
 
-    public KnowledgeLevelResponse getDashBoardResult(String memberNo, DashboardRequest request) {
+    public List<Integer> getDashBoardResult(String memberNo, DashboardRequest request) {
 
         DashboardDto result = new DashboardDto();
 
@@ -56,13 +52,6 @@ public class DiagnosisService {
                                 .flatMap(Collection::stream)
                                 .collect(Collectors.toList());
 
-//        mergedList.stream()
-//                .map(prob -> {
-//                    q_idx_list.add(prob.getQ_idx());
-//                    correct_list.add(prob.getCorrect());
-//                    diff_level_list.add(prob.getDiff_level());
-//                    return null;
-//                });
         List<Integer> q_idx_list = mergedList.stream()
                 .map(m -> m.getQ_idx()).collect(Collectors.toList());  // 토픽 리스트
 
@@ -103,10 +92,24 @@ public class DiagnosisService {
         tritonRequest.setInputs(inputs);
 
         // RestTemplate을 사용하여 트리톤 지식상태 추론 서버의 응답 값 반환
-        return postWithKnowledgeLevelTriton(tritonRequest);
+        KnowledgeLevelResponse response = postWithKnowledgeLevelTriton(tritonRequest);
 
-//        return result;
+        // 지식수준 추론 결과
+        List<Double> knowledgeRates = response.getOutputs().get(0).getData();
+
+        // 영역 셋 (중복제거 o)
+        Set<String> categories = mergedList.stream()
+                .map(m -> m.getCateg_nm()).collect(Collectors.toSet());// 카테고리 명 셋
+        
+        // TODO
+        // DiagnosisMapper의 getQIdxWithCategory를 통해 영역 셋을 순환하면서 해당하는 q_idx 목록 조회
+        // 조회 후, 지식수준 추론 결과에서 각 카테고리에 해당하는 q_idx들을 활용하여 지식수준 값을 가져와서 평균값 계산
+        // 해당 평균값들을 영역별로 구분하여 반환
+
+        // 영역 셋 순환
+        diagnosisMapper.getQIdxWithCategory(카테고리 이름);
     }
+
 
     public KnowledgeLevelResponse postWithKnowledgeLevelTriton(KnowledgeLevelRequest request) {
 
@@ -122,90 +125,90 @@ public class DiagnosisService {
      * @param resultRequest 진단평가 결과 데이터
      * @return WholeCorrectRate 반환
      */
-    public WholeCorrectRate calculateWholeCorrectRate(DiagnosisResultRequest resultRequest) {
-        Map<String, Integer> correctRecords = new HashMap<>();
-
-        for (DiagnosisProblemDto prob : resultRequest.getProb_list()) {
-            int correct = prob.getCorrect();
-            if (correct == 0) { // 오답 count
-                correctRecords.put(WRONG_ANSWER_KEY, correctRecords.getOrDefault(WRONG_ANSWER_KEY, 0) + 1);
-            } else { // 정답 count
-                correctRecords.put(CORRECT_ANSWER_KEY, correctRecords.getOrDefault(CORRECT_ANSWER_KEY, 0) + 1);
-            }
-        }
-
-        int total = resultRequest.getProb_list().size();
-        int correct = correctRecords.getOrDefault(CORRECT_ANSWER_KEY, 0);
-        int wrong = correctRecords.getOrDefault(WRONG_ANSWER_KEY, 0);
-
-        return new WholeCorrectRate(total, correct, wrong);
-    }
-
-    /**
-     * 난이도별 정답률 계산
-     *
-     * @param resultRequest 진단평가 결과 데이터
-     * @return List<DiffLevelCorrectRate> 반환
-     */
-    public List<DiffLevelCorrectRate> calculateDiffLevelCorrectRates(DiagnosisResultRequest resultRequest) {
-        Map<Integer, CorrectCounter> diffLevelRecords = new HashMap<>();
-
-        for (DiagnosisProblemDto prob : resultRequest.getProb_list()) {
-            int diff_level = prob.getDiff_level();
-            int correct = prob.getCorrect();
-
-            diffLevelRecords.putIfAbsent(diff_level, new CorrectCounter());
-
-            if (correct == 0) { // 오답 count
-                diffLevelRecords.get(diff_level).wrongCountUp();
-            } else { // 정답 count
-                diffLevelRecords.get(diff_level).correctCountUp();
-            }
-        }
-
-        return diffLevelRecords.entrySet()
-                .stream()
-                .map(entry -> {
-                    int diff_level = entry.getKey();
-                    CorrectCounter counter = entry.getValue();
-                    return new DiffLevelCorrectRate(diff_level, counter.getCorrectCount(), counter.getWrongCount());
-                })
-                .collect(Collectors.toList());
-    }
-
-    /**
-     * 토픽별 정답률 계산
-     *
-     * @param resultRequest 진단평가 결과 데이터
-     * @return List<TopicCorrectRate> 반환
-     */
-    public List<TopicCorrectRate> calculateTopicCorrectRates(DiagnosisResultRequest resultRequest) {
-        Map<Integer, CorrectCounter> topicRecords = new HashMap<>();
-        Map<Integer, String> topicNames = new HashMap<>();
-
-        for (DiagnosisProblemDto prob : resultRequest.getProb_list()) {
-            int q_idx = prob.getQ_idx();
-            int correct = prob.getCorrect();
-            String topic_nm = prob.getTopic_nm();
-
-            // q_idx와 topic_nm 매핑
-            topicNames.putIfAbsent(q_idx, topic_nm);
-            topicRecords.putIfAbsent(q_idx, new CorrectCounter());
-
-            if (correct == 0) { // 오답 count
-                topicRecords.get(q_idx).wrongCountUp();
-            } else { // 정답 count
-                topicRecords.get(q_idx).correctCountUp();
-            }
-        }
-
-        return topicRecords.entrySet()
-                .stream()
-                .map(entry -> {
-                    int q_idx = entry.getKey();
-                    CorrectCounter counter = entry.getValue();
-                    return new TopicCorrectRate(topicNames.get(q_idx), counter.getCorrectCount(), counter.getWrongCount());
-                })
-                .collect(Collectors.toList());
-    }
+//    public WholeCorrectRate calculateWholeCorrectRate(DiagnosisResultRequest resultRequest) {
+//        Map<String, Integer> correctRecords = new HashMap<>();
+//
+//        for (DiagnosisProblemDto prob : resultRequest.getProb_list()) {
+//            int correct = prob.getCorrect();
+//            if (correct == 0) { // 오답 count
+//                correctRecords.put(WRONG_ANSWER_KEY, correctRecords.getOrDefault(WRONG_ANSWER_KEY, 0) + 1);
+//            } else { // 정답 count
+//                correctRecords.put(CORRECT_ANSWER_KEY, correctRecords.getOrDefault(CORRECT_ANSWER_KEY, 0) + 1);
+//            }
+//        }
+//
+//        int total = resultRequest.getProb_list().size();
+//        int correct = correctRecords.getOrDefault(CORRECT_ANSWER_KEY, 0);
+//        int wrong = correctRecords.getOrDefault(WRONG_ANSWER_KEY, 0);
+//
+//        return new WholeCorrectRate(total, correct, wrong);
+//    }
+//
+//    /**
+//     * 난이도별 정답률 계산
+//     *
+//     * @param resultRequest 진단평가 결과 데이터
+//     * @return List<DiffLevelCorrectRate> 반환
+//     */
+//    public List<DiffLevelCorrectRate> calculateDiffLevelCorrectRates(DiagnosisResultRequest resultRequest) {
+//        Map<Integer, CorrectCounter> diffLevelRecords = new HashMap<>();
+//
+//        for (DiagnosisProblemDto prob : resultRequest.getProb_list()) {
+//            int diff_level = prob.getDiff_level();
+//            int correct = prob.getCorrect();
+//
+//            diffLevelRecords.putIfAbsent(diff_level, new CorrectCounter());
+//
+//            if (correct == 0) { // 오답 count
+//                diffLevelRecords.get(diff_level).wrongCountUp();
+//            } else { // 정답 count
+//                diffLevelRecords.get(diff_level).correctCountUp();
+//            }
+//        }
+//
+//        return diffLevelRecords.entrySet()
+//                .stream()
+//                .map(entry -> {
+//                    int diff_level = entry.getKey();
+//                    CorrectCounter counter = entry.getValue();
+//                    return new DiffLevelCorrectRate(diff_level, counter.getCorrectCount(), counter.getWrongCount());
+//                })
+//                .collect(Collectors.toList());
+//    }
+//
+//    /**
+//     * 토픽별 정답률 계산
+//     *
+//     * @param resultRequest 진단평가 결과 데이터
+//     * @return List<TopicCorrectRate> 반환
+//     */
+//    public List<TopicCorrectRate> calculateTopicCorrectRates(DiagnosisResultRequest resultRequest) {
+//        Map<Integer, CorrectCounter> topicRecords = new HashMap<>();
+//        Map<Integer, String> topicNames = new HashMap<>();
+//
+//        for (DiagnosisProblemDto prob : resultRequest.getProb_list()) {
+//            int q_idx = prob.getQ_idx();
+//            int correct = prob.getCorrect();
+//            String topic_nm = prob.getTopic_nm();
+//
+//            // q_idx와 topic_nm 매핑
+//            topicNames.putIfAbsent(q_idx, topic_nm);
+//            topicRecords.putIfAbsent(q_idx, new CorrectCounter());
+//
+//            if (correct == 0) { // 오답 count
+//                topicRecords.get(q_idx).wrongCountUp();
+//            } else { // 정답 count
+//                topicRecords.get(q_idx).correctCountUp();
+//            }
+//        }
+//
+//        return topicRecords.entrySet()
+//                .stream()
+//                .map(entry -> {
+//                    int q_idx = entry.getKey();
+//                    CorrectCounter counter = entry.getValue();
+//                    return new TopicCorrectRate(topicNames.get(q_idx), counter.getCorrectCount(), counter.getWrongCount());
+//                })
+//                .collect(Collectors.toList());
+//    }
 }
