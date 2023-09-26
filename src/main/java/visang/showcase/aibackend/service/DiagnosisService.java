@@ -49,13 +49,8 @@ public class DiagnosisService {
      * @return WholeCorrectRate 반환
      */
     public WholeCorrectRate calculateWholeCorrectRate(DiagnosisResultRequest resultRequest) {
-
-        // ???
-//        Map<String, Integer> correctRecords = resultRequest.getProb_list()
-//                .stream()
-//                .collect(Collectors.groupingBy(DiagnosisProblemDto::getSubsection_nm, Collectors.summingInt(DiagnosisProblemDto::getCorrect)));
-
         Map<String, Integer> correctRecords = new HashMap<>();
+
         for (DiagnosisProblemDto prob : resultRequest.getProb_list()) {
             int correct = prob.getCorrect();
             if (correct == 0) { // 오답 count
