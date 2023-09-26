@@ -28,11 +28,18 @@ public class DiagnosisService {
     public List<DiagnosisResultDto> sendResult(DiagnosisResultRequest request) {
 
         List<DiagnosisProblemDto> list = request.getProb_list();
+
         return list.stream()
                 .map(prob -> {
                     DiagnosisResultQueryDto dto = diagnosisMapper.sendResult(prob.getProb_solve_idx());
                     return new DiagnosisResultDto(dto.getProb_solve_idx(), dto.getSubsection_nm(), dto.getTopic_nm(), prob.getCorrect());
                 })
                 .collect(Collectors.toList());
+
+    }
+
+    public List<String, Object> getDashBoardResult() {
+
+
     }
 }

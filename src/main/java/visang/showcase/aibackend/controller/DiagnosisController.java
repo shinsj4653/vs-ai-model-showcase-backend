@@ -35,4 +35,9 @@ public class DiagnosisController {
         List<DiagnosisResultDto> result = diagnosisService.sendResult(resultRequest);
         return ResponseUtil.SUCCESS("학생의 진단평가 결과 조회 성공", result);
     }
+    @GetMapping("dashboard")
+    public ResponseDto<List<DiagnosisProblemDto>> getDashboardResult() {
+
+    }
+
 }

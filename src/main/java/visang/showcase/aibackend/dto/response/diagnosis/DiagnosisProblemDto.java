@@ -4,6 +4,7 @@ import lombok.Getter;
 
 @Getter
 public class DiagnosisProblemDto {
+    private Integer q_idx; // 토픽 인덱스
     private Integer prob_solve_idx; // 문제 풀이 문항 인덱스
     private Integer diff_level; // 난이도
     private Integer correct; // 문항 정오답 여부
