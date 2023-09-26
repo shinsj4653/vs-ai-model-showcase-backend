@@ -1,12 +1,10 @@
 package visang.showcase.aibackend.dto.response.diagnosis;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
+import lombok.*;
 
 import java.util.List;
 
-@Getter
-@AllArgsConstructor
+@Data
 public class DashboardDto {
 
     /* 전체 정답률 */
