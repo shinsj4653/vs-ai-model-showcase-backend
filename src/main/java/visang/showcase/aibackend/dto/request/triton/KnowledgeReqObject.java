@@ -2,11 +2,10 @@ package visang.showcase.aibackend.dto.request.triton;
 
 import lombok.Data;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @Data
-public class KnowledgeObject {
+public class KnowledgeReqObject {
     private String name;
     private String datatype;
     private List<Integer> shape;

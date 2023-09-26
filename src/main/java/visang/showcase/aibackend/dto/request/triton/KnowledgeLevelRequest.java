@@ -6,5 +6,5 @@ import java.util.List;
 
 @Data
 public class KnowledgeLevelRequest {
-    List<KnowledgeObject> inputs;
+    List<KnowledgeReqObject> inputs;
 }

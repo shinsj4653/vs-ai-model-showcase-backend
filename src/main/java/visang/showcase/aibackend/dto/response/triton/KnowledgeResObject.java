@@ -4,12 +4,14 @@ import lombok.AccessLevel;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Data
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class KnowledgeLevelResponse {
-    String model_name;
-    String model_version;
-    List<KnowledgeResObject> outputs;
+public class KnowledgeResObject {
+    private String name;
+    private String datatype;
+    private List<Integer> shape;
+    private List<Double> data;
 }

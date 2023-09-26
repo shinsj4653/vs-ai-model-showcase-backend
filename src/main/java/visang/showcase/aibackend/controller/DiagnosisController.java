@@ -6,7 +6,7 @@ import visang.showcase.aibackend.dto.request.diagnosis.DashboardRequest;
 import visang.showcase.aibackend.dto.response.common.ResponseDto;
 import visang.showcase.aibackend.dto.response.common.ResponseUtil;
 import visang.showcase.aibackend.dto.response.diagnosis.DiagnosisProblemDto;
-import visang.showcase.aibackend.dto.response.diagnosis.DiagnosisResultDto;
+import visang.showcase.aibackend.dto.response.triton.KnowledgeLevelResponse;
 import visang.showcase.aibackend.service.DiagnosisService;
 
 import javax.servlet.http.HttpSession;
@@ -30,9 +30,16 @@ public class DiagnosisController {
         }
     }
 
-//    @PostMapping("dashboard")
-//    public ResponseDto<List<DiagnosisProblemDto>> getDashboardResult(@RequestBody DashboardRequest request) {
-//
-//    }
+    @PostMapping("dashboard")
+    public ResponseDto<KnowledgeLevelResponse> getDashboardResult(HttpSession session, @RequestBody DashboardRequest request) {
+        String memberNo = (String) session.getAttribute("memberNo");
+        // memberNo 값이 세션에 존재할 경우에만 서비스단 로직 수행
+        if (memberNo != null) {
+            return ResponseUtil.SUCCESS("진단평가의 대시보드 결과 조회 성공", diagnosisService.getDashBoardResult(memberNo, request));
+
+        } else {
+            return ResponseUtil.ERROR("세션에 memberNo가 없습니다.", null);
+        }
+    }
 
 }
