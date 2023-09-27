@@ -13,5 +13,5 @@ public interface DiagnosisMapper {
 
     DiagnosisResultQueryDto sendResult(@Param("probSolveIdx") Integer probSolveIdx);
 
-    List<Integer> getQIdxWithCategory(@Param("categ_nm") String categoryName);
+    List<Integer> getQIdxWithCategory(@Param("categoryCode") String categoryCode);
 }

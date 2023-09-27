@@ -13,6 +13,7 @@
                tpsr.prob_no,
                tpsr.prob_seq_no,
                tti.topic_nm,
+               tti.categ_cd,
                tti.categ_nm,
                tti.chapter_nm,
                tti.section_nm,
@@ -43,6 +44,6 @@
         select distinct tpsr.q_idx
         from ai_model_showcase.tb_prob_solve_result tpsr
         join ai_model_showcase.tb_topic_info tti on tpsr.q_idx = tti.q_idx
-        where tti.categ_nm = #{categoryName};
+        where tti.categ_cd = #{categoryCode};
     </select>
 </mapper>

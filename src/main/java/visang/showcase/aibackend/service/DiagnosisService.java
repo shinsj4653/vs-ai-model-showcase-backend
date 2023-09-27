@@ -9,19 +9,15 @@ import visang.showcase.aibackend.dto.request.triton.KnowledgeLevelRequest;
 import visang.showcase.aibackend.dto.request.triton.KnowledgeReqObject;
 import visang.showcase.aibackend.dto.response.diagnosis.DashboardDto;
 import visang.showcase.aibackend.dto.response.diagnosis.DiagnosisProblemDto;
+import visang.showcase.aibackend.dto.response.triton.AreaKnowledgeResponse;
 import visang.showcase.aibackend.dto.response.triton.KnowledgeLevelResponse;
-import visang.showcase.aibackend.dto.response.diagnosis.DiagnosisResultDto;
-import visang.showcase.aibackend.dto.response.diagnosis.DiagnosisResultQueryDto;
-import visang.showcase.aibackend.dto.response.diagnosis.dashboard.DiffLevelCorrectRate;
-import visang.showcase.aibackend.dto.response.diagnosis.dashboard.TopicCorrectRate;
-import visang.showcase.aibackend.dto.response.diagnosis.dashboard.WholeCorrectRate;
-import visang.showcase.aibackend.dto.response.triton.KnowledgeResObject;
 import visang.showcase.aibackend.mapper.DiagnosisMapper;
-import visang.showcase.aibackend.vo.CorrectCounter;
 
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+
+import static java.util.stream.Collectors.reducing;
 
 @Slf4j
 @Service
@@ -35,9 +31,12 @@ public class DiagnosisService {
     public List<DiagnosisProblemDto> getProblems(String memberNo) {
 
         // 끝부분 15개의 문항만 클라이언트로 반환
-        return diagnosisMapper.getProblems(memberNo).subList(85 , 100);
+        return diagnosisMapper.getProblems(memberNo).subList(85, 100);
     }
 
+    /**
+     * 리팩토링 해야함
+     */
     public List<Integer> getDashBoardResult(String memberNo, DashboardRequest request) {
 
         DashboardDto result = new DashboardDto();
@@ -46,11 +45,11 @@ public class DiagnosisService {
         KnowledgeLevelRequest tritonRequest = new KnowledgeLevelRequest();
 
         List<DiagnosisProblemDto> preList = diagnosisMapper.getProblems(memberNo).subList(0, 85);
-        
+
         // 앞의 85문제 + 학생 진단 후의 15문제 => 총 100 문제
         List<DiagnosisProblemDto> mergedList = Stream.of(preList, request.getProb_list())
-                                .flatMap(Collection::stream)
-                                .collect(Collectors.toList());
+                .flatMap(Collection::stream)
+                .collect(Collectors.toList());
 
         List<Integer> q_idx_list = mergedList.stream()
                 .map(m -> m.getQ_idx()).collect(Collectors.toList());  // 토픽 리스트
@@ -77,10 +76,8 @@ public class DiagnosisService {
             if (i == 0)
                 data.add(q_idx_list);
 
-
             if (i == 1)
                 data.add(correct_list);
-
 
             if (i == 2)
                 data.add(diff_level_list);
@@ -91,23 +88,39 @@ public class DiagnosisService {
 
         tritonRequest.setInputs(inputs);
 
+
         // RestTemplate을 사용하여 트리톤 지식상태 추론 서버의 응답 값 반환
         KnowledgeLevelResponse response = postWithKnowledgeLevelTriton(tritonRequest);
 
         // 지식수준 추론 결과
         List<Double> knowledgeRates = response.getOutputs().get(0).getData();
 
+        // category_cd와 category_nm 매핑
+        Map<String, String> categoryRecords = new HashMap<>();
+
         // 영역 셋 (중복제거 o)
         Set<String> categories = mergedList.stream()
-                .map(m -> m.getCateg_nm()).collect(Collectors.toSet());// 카테고리 명 셋
-        
-        // TODO
-        // DiagnosisMapper의 getQIdxWithCategory를 통해 영역 셋을 순환하면서 해당하는 q_idx 목록 조회
-        // 조회 후, 지식수준 추론 결과에서 각 카테고리에 해당하는 q_idx들을 활용하여 지식수준 값을 가져와서 평균값 계산
-        // 해당 평균값들을 영역별로 구분하여 반환
+                .map(m -> {
+                    categoryRecords.putIfAbsent(m.getCateg_cd(), m.getCateg_nm());
+                    return m.getCateg_cd();
+                })
+                .collect(Collectors.toSet());// 카테고리 명 셋
 
-        // 영역 셋 순환
-        diagnosisMapper.getQIdxWithCategory(카테고리 이름);
+        List<AreaKnowledgeResponse> areaKnowledges = new ArrayList<>();
+        // 영역 셋을 순환하면서 영역
+        for (String categoryCode : categories) {
+            List<Integer> qIdxs = diagnosisMapper.getQIdxWithCategory(categoryCode);
+            Double sum = qIdxs.stream()
+                    .map(qIdx -> knowledgeRates.get(qIdx))
+                    .collect(reducing(Double::sum))
+                    .get();
+
+            Double avg = sum / qIdxs.size();
+            String knowledgeLevel = String.format("%.2f", avg);
+            areaKnowledges.add(new AreaKnowledgeResponse(categoryRecords.get(categoryCode), knowledgeLevel, "진단평가"));
+        }
+
+        return null;
     }
 
 

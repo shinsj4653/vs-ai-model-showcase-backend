@@ -11,6 +11,7 @@ public class DiagnosisProblemDto {
     private Integer prob_no; // 문항 번호
     private Integer prob_seq_no; // 문항 순서
     private String topic_nm; // 토픽 한글명
+    private String categ_cd; // 영역 코드
     private String categ_nm; // 영역 한글명
     private String chapter_nm; // 대단원 한글명
     private String section_nm; // 중단원 한글명
