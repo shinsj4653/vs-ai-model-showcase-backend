@@ -3,7 +3,7 @@ package visang.showcase.aibackend.service;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import visang.showcase.aibackend.dto.request.MemberNoRequest;
+import visang.showcase.aibackend.dto.request.member.MemberNoRequest;
 import visang.showcase.aibackend.dto.response.member.MemberDto;
 import visang.showcase.aibackend.dto.response.member.MemberQueryDto;
 import visang.showcase.aibackend.mapper.MemberMapper;
