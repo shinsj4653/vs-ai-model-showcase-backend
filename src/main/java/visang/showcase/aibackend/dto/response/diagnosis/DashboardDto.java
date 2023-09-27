@@ -1,6 +1,10 @@
 package visang.showcase.aibackend.dto.response.diagnosis;
 
-import lombok.*;
+import lombok.Data;
+import visang.showcase.aibackend.dto.response.diagnosis.dashboard.DiffLevelCorrectRate;
+import visang.showcase.aibackend.dto.response.diagnosis.dashboard.TopicCorrectRate;
+import visang.showcase.aibackend.dto.response.triton.AreaKnowledgeResponse;
+import visang.showcase.aibackend.vo.TopicKnowledge;
 
 import java.util.List;
 
@@ -13,17 +17,17 @@ public class DashboardDto {
     private Integer incorrect_answers; // 오답 수
 
     /* 난이도별 정답률 */
-    private List<Object> difficulty_levels;
+    private List<DiffLevelCorrectRate> difficulty_levels;
 
     /* 토픽별 정답률 */
-    private List<Object> topic_answer_result;
+    private List<TopicCorrectRate> topic_answer_result;
 
     /* 영역별 지식 수준 */
-    private List<Object> section_level;
+    private List<AreaKnowledgeResponse> section_level;
 
     /* 강/약 지식요인 */
-    private List<Object> strong_level;
-    private List<Object> weak_level;
+    private List<TopicKnowledge> strong_level;
+    private List<TopicKnowledge> weak_level;
 
     /* 앞으로 배울 토픽 예상 지식 수준 */
     private List<Object> future_topic_level_expectation;
