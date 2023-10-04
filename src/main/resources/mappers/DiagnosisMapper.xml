@@ -46,4 +46,11 @@
         join ai_model_showcase.tb_topic_info tti on tpsr.q_idx = tti.q_idx
         where tti.categ_cd = #{categoryCode};
     </select>
+    
+    <!-- GET member의 tgt_topic -->
+    <select id="getTgtTopic" resultType="Integer" fetchSize="1000">
+        select tgt_topic
+        from ai_model_showcase.tb_member_info tmi
+        where tmi.member_no = #{memberNo};
+    </select>
 </mapper>

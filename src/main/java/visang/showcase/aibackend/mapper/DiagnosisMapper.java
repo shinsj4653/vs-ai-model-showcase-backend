@@ -10,4 +10,6 @@ import java.util.List;
 public interface DiagnosisMapper {
     List<DiagnosisProblemDto> getProblems(@Param("memberNo") String memberNo);
     List<Integer> getQIdxWithCategory(@Param("categoryCode") String categoryCode);
+
+    Integer getTgtTopic(@Param("memberNo") String memberNo);
 }

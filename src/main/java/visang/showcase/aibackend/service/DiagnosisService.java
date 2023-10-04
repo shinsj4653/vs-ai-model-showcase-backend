@@ -19,6 +19,8 @@ import visang.showcase.aibackend.mapper.DiagnosisMapper;
 import visang.showcase.aibackend.vo.CorrectCounter;
 import visang.showcase.aibackend.vo.TopicKnowledge;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -138,7 +140,7 @@ public class DiagnosisService {
      * @param request  진단평가 결과 데이터
      * @return DashboardDto 반환
      */
-    public DashboardDto getDashBoardResult(String memberNo, DashboardRequest request) {
+    public DashboardDto getDashBoardResult(String memberNo, DashboardRequest request, HttpServletRequest httpServletRequest) {
         // 트리톤 서버에 전송할 RequestBody 생성
         KnowledgeLevelRequest tritonRequest = createTritonRequest(memberNo, request);
         // RestTemplate을 사용하여 트리톤 지식상태 추론 서버의 응답 값 반환
@@ -148,6 +150,14 @@ public class DiagnosisService {
         List<Double> knowledgeRates = response.getOutputs()
                 .get(0)
                 .getData();
+
+        // 멤버의 타깃 토픽에 대한 지식 수준 -> 세션에 저장하기
+        Integer tgtTopic = diagnosisMapper.getTgtTopic(memberNo);
+        Double tgtTopicKnowledgeRate = knowledgeRates.get(tgtTopic);
+
+        // 세션을 얻어와서 tgtTopicKnowledgeRate 값을 세션에 저장
+        HttpSession session = httpServletRequest.getSession();
+        session.setAttribute("tgtTopicKnowledgeRate", tgtTopicKnowledgeRate);
 
         return createDashBoardResponse(request, knowledgeRates);
     }

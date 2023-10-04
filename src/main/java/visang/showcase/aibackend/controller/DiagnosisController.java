@@ -8,6 +8,7 @@ import visang.showcase.aibackend.dto.response.common.ResponseUtil;
 import visang.showcase.aibackend.dto.response.diagnosis.DiagnosisProblemDto;
 import visang.showcase.aibackend.service.DiagnosisService;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import java.util.List;
 
@@ -31,11 +32,11 @@ public class DiagnosisController {
     }
 
     @PostMapping("dashboard")
-    public ResponseDto<?> getDashboardResult(HttpSession session, @RequestBody DashboardRequest request) {
+    public ResponseDto<?> getDashboardResult(HttpSession session, @RequestBody DashboardRequest request, HttpServletRequest httpServletRequest) {
         String memberNo = (String) session.getAttribute("memberNo");
         // memberNo 값이 세션에 존재할 경우에만 서비스단 로직 수행
         if (memberNo != null) {
-            return ResponseUtil.SUCCESS("진단평가의 대시보드 결과 조회 성공", diagnosisService.getDashBoardResult(memberNo, request));
+            return ResponseUtil.SUCCESS("진단평가의 대시보드 결과 조회 성공", diagnosisService.getDashBoardResult(memberNo, request, httpServletRequest));
 
         } else {
             return ResponseUtil.ERROR("세션에 memberNo가 없습니다.", null);

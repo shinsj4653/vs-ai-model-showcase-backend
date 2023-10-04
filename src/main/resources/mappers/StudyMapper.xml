@@ -16,9 +16,9 @@
                tti.section_nm,
                tti.subsection_nm,
                tpi.imgpath,
-               tpi.mv_path        as video_url
+               tpi.mv_path as video_url
         from ai_model_showcase.tb_prob_info tpi
-                 join ai_model_showcase.tb_topic_info tti on tpi.q_idx = tti.q_idx
+        join ai_model_showcase.tb_topic_info tti on tpi.q_idx = tti.q_idx
         where tpi.prob_no = #{prob_no};
     </select>
 </mapper>
