@@ -88,8 +88,6 @@ public class RecommendController {
         module.addDeserializer(BigDecimal.class, new NumberDeserializers.BigDecimalDeserializer());
         objectMapper.registerModule(module);
 
-        // JSON 데이터를 역직렬화합니다.
-
         RestTemplate restTemplate = new RestTemplate();
         RecommendProbResponse response = restTemplate.postForObject("http://10.214.2.33:8000" + "/v2/models/gkt_reco/infer", request, RecommendProbResponse.class);
         return response;

@@ -34,7 +34,7 @@ public class DiagnosisService {
     private static final String WRONG_ANSWER_KEY = "no";
 
     // 100개의 문제에 해당하는 category_cd
-    private Set<String> categories = new HashSet<>();
+    private Set<String> categories;
     // category_cd와 category_nm 매핑
     private Map<String, String> categoryRecords = new HashMap<>();
     // q_Idx와 topic_nm 매핑
@@ -56,13 +56,13 @@ public class DiagnosisService {
      * category_cd와 category_nm 매핑
      */
     private void createProbMetaData(List<DiagnosisProblemDto> mergedList) {
-        System.out.println("실행됨");
         categories = mergedList.stream()
                 .map(prob -> {
                     categoryRecords.putIfAbsent(prob.getCateg_cd(), prob.getCateg_nm());
                     topicRecords.putIfAbsent(prob.getQ_idx(), prob.getTopic_nm());
                     return prob.getCateg_cd();
                 })
+                .filter(Objects::nonNull)
                 .collect(Collectors.toSet());
     }
 
@@ -107,10 +107,6 @@ public class DiagnosisService {
 
         List<Integer> diff_level_list = mergedList.stream()
                 .map(m -> m.getDiff_level()).collect(Collectors.toList()); // 문제 난이도 리스트
-
-        System.out.println(q_idx_list);
-        System.out.println(correct_list);
-        System.out.println(diff_level_list);
 
         // INPUT__ 객체 생성
         List<KnowledgeReqObject> inputs = new ArrayList<>();
@@ -286,9 +282,9 @@ public class DiagnosisService {
         List<AreaKnowledgeResponse> areaKnowledges = new ArrayList<>();
         // 영역 셋을 순환하면서 영역
         for (String categoryCode : categories) {
-            System.out.println(categoryCode);
+//            System.out.println(categoryCode);
             List<Integer> qIdxs = diagnosisMapper.getQIdxWithCategory(categoryCode);
-            System.out.println(qIdxs);
+//            System.out.println(qIdxs);
             // 영역에 해당하는 토픽들의 지식수준의 합계 계산
             Double sum = qIdxs.stream()
                     .map(qIdx -> knowledgeRates.get(qIdx))
@@ -332,12 +328,14 @@ public class DiagnosisService {
         // 강한 지식요인 3개 추출
         List<TopicKnowledge> strongKnowledges = topicKnowledges.stream()
                 .filter(topicKnowledge -> topicKnowledge.getKnowledgeRate() >= THRESHOLD)
-                .limit(3)
+                .limit(3) // 앞에서 3개
                 .collect(Collectors.toList());
+
         // 약한 지식요인 3개 추출
         List<TopicKnowledge> weakKnowledges = topicKnowledges.stream()
                 .filter(topicKnowledge -> topicKnowledge.getKnowledgeRate() < THRESHOLD)
-                .limit(3)
+                .sorted() // 오름차순 정렬
+                .limit(3) // 앞에서 3개
                 .collect(Collectors.toList());
 
         return new StrongWeakKnowledgeResponse(strongKnowledges, weakKnowledges);
