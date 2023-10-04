@@ -352,14 +352,10 @@ public class DiagnosisService {
             nextQIdxs.add(nextQIdx);
         }
 
-        // 다음 토픽 5개애 해당하는 지식수준 추출
         List<ExpectedTopicResponse> result = new ArrayList<>();
-
-        // 토픽 인덱스에 해당하는 토픽이름 데이터 조회
-        List<String> topicNames = diagnosisMapper.getTopicNamesWithQIdxs(nextQIdxs);
-        for (int i = 0; i < 5; i++) {
-            result.add(new ExpectedTopicResponse(topicNames.get(i), knowledgeRates.get(nextQIdxs.get(i))));
-        }
+        // 토픽 인덱스 5개에 해당하는 토픽이름 데이터 조회 및 지식수준 추출
+        diagnosisMapper.getTopicNamesWithQIdxs(nextQIdxs)
+                .forEach((row) -> result.add(new ExpectedTopicResponse(row.getTopic_nm(), knowledgeRates.get(row.getQ_idx()))));
 
         return result;
     }
