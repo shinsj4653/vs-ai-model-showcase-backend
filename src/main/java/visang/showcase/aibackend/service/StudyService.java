@@ -32,7 +32,7 @@ public class StudyService {
     private final StudyMapper studyMapper;
     public StudyReadyDto isStudyReady(Double tgtTopicKnowledgeRate){
         // 타켓토픽의 지식 수준이 특정 기준을 못 넘길시, 학습할 준비가 안되었다고 판단
-        if (tgtTopicKnowledgeRate >= 0.5)
+        if (tgtTopicKnowledgeRate >= 0.6)
             return new StudyReadyDto(true);
         else
             return new StudyReadyDto(false);
