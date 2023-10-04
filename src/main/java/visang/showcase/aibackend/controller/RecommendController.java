@@ -1,15 +1,15 @@
 package visang.showcase.aibackend.controller;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
 import visang.showcase.aibackend.dto.request.diagnosis.DashboardRequest;
 import visang.showcase.aibackend.dto.request.triton.KnowledgeLevelRequest;
 import visang.showcase.aibackend.dto.request.triton.KnowledgeReqObject;
 import visang.showcase.aibackend.dto.response.diagnosis.DiagnosisProblemDto;
+import visang.showcase.aibackend.dto.response.recommend.RecommendProblemDto;
 import visang.showcase.aibackend.mapper.DiagnosisMapper;
+import visang.showcase.aibackend.mapper.RecommendMapper;
 
 import javax.servlet.http.HttpSession;
 import java.util.ArrayList;
@@ -23,6 +23,7 @@ import java.util.stream.Stream;
 public class RecommendController {
 
     private final DiagnosisMapper diagnosisMapper;
+    private final RecommendMapper recommendMapper;
 
     /**
      * RequestBody의 INPUT__ 요청 객체 생성
@@ -117,5 +118,8 @@ public class RecommendController {
         return postWithRecommendTriton(recommendProbRequest);
     }
 
-
+    @GetMapping("/recommend/prob/{prob_no}")
+    public RecommendProblemDto getRecommendProb(@PathVariable String prob_no) {
+        return recommendMapper.getRecommendProblemWithProbNo(prob_no);
+    }
 }
