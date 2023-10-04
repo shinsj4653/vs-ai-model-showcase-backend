@@ -25,7 +25,7 @@
         join ai_model_showcase.tb_prob_info tpi on tpsr.prob_no = tpi.prob_no
         join ai_model_showcase.tb_topic_info tti on tpsr.q_idx = tti.q_idx
         where tti.q_idx = #{qIdx}
-        order by tpsr.prob_solve_idx asc
+        order by tpsr.diff_level asc
         limit 5;
     </select>
 </mapper>
