@@ -1,5 +1,9 @@
 package visang.showcase.aibackend.controller;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.deser.std.NumberDeserializers;
+import com.fasterxml.jackson.databind.module.SimpleModule;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -12,6 +16,7 @@ import visang.showcase.aibackend.dto.response.diagnosis.DiagnosisProblemDto;
 import visang.showcase.aibackend.mapper.DiagnosisMapper;
 
 import javax.servlet.http.HttpSession;
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -73,19 +78,28 @@ public class RecommendController {
         return new KnowledgeLevelRequest(inputs);
     }
 
-    private RecommendProbResponse postWithKnowledgeLevelTriton(KnowledgeLevelRequest request) {
+    private RecommendProbResponse postWithRecommendTriton(KnowledgeLevelRequest request) throws JsonProcessingException {
+
+        // ObjectMapper를 설정합니다.
+        ObjectMapper objectMapper = new ObjectMapper();
+
+        // BigDecimal 모듈을 설정합니다.
+        SimpleModule module = new SimpleModule();
+        module.addDeserializer(BigDecimal.class, new NumberDeserializers.BigDecimalDeserializer());
+        objectMapper.registerModule(module);
+
+        // JSON 데이터를 역직렬화합니다.
 
         RestTemplate restTemplate = new RestTemplate();
-        RecommendProbResponse responseEntity = restTemplate.postForObject("http://10.214.2.33:8000" + "/v2/models/gkt_reco/infer", request, RecommendProbResponse.class);
-
-        return responseEntity;
+        RecommendProbResponse response = restTemplate.postForObject("http://10.214.2.33:8000" + "/v2/models/gkt_reco/infer", request, RecommendProbResponse.class);
+        return response;
     }
 
     @PostMapping("/recommend")
-    public RecommendProbResponse recommendProb(HttpSession session, @RequestBody DashboardRequest request) {
+    public RecommendProbResponse recommendProb(HttpSession session, @RequestBody DashboardRequest request) throws JsonProcessingException {
         String memberNo = (String) session.getAttribute("memberNo");
         System.out.println(request.getProb_list().size());
-        KnowledgeLevelRequest knowledgeLevelRequest = createTritonRequest(memberNo, request);
-        return postWithKnowledgeLevelTriton(knowledgeLevelRequest);
+        KnowledgeLevelRequest recommendProbRequest = createTritonRequest(memberNo, request);
+        return postWithRecommendTriton(recommendProbRequest);
     }
 }
