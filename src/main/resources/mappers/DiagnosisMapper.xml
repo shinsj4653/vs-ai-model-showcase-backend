@@ -13,6 +13,7 @@
                tpsr.prob_no,
                tpsr.prob_seq_no,
                tti.topic_nm,
+               tti.categ_cd,
                tti.categ_nm,
                tti.chapter_nm,
                tti.section_nm,
@@ -43,6 +44,24 @@
         select distinct tpsr.q_idx
         from ai_model_showcase.tb_prob_solve_result tpsr
         join ai_model_showcase.tb_topic_info tti on tpsr.q_idx = tti.q_idx
-        where tti.categ_nm = #{categoryName};
+        where tti.categ_cd = #{categoryCode};
+    </select>
+    
+    <!-- GET member의 tgt_topic -->
+    <select id="getTgtTopic" resultType="Integer" fetchSize="1000">
+        select tgt_topic
+        from ai_model_showcase.tb_member_info tmi
+        where tmi.member_no = #{memberNo};
+    </select>
+
+    <!-- GET /diagnosis/dashboard : 영역별 포함된 q_idx 값 가져오기 -->
+    <select id="getTopicNamesWithQIdxs" resultType="TopicInfoRow" parameterType="java.util.List" fetchSize="1000">
+        select tti.q_idx,
+        tti.topic_nm
+        from ai_model_showcase.tb_topic_info tti
+        where tti.q_idx in
+        <foreach collection="qIdxs" item="qIdx" open="(" separator="," close=")">
+            #{qIdx}
+        </foreach>
     </select>
 </mapper>

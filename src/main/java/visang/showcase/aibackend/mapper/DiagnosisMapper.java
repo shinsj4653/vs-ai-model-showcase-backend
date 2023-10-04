@@ -3,7 +3,7 @@ package visang.showcase.aibackend.mapper;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 import visang.showcase.aibackend.dto.response.diagnosis.DiagnosisProblemDto;
-import visang.showcase.aibackend.dto.response.diagnosis.DiagnosisResultQueryDto;
+import visang.showcase.aibackend.dto.response.diagnosis.dashboard.TopicInfoRow;
 
 import java.util.List;
 
@@ -11,7 +11,9 @@ import java.util.List;
 public interface DiagnosisMapper {
     List<DiagnosisProblemDto> getProblems(@Param("memberNo") String memberNo);
 
-    DiagnosisResultQueryDto sendResult(@Param("probSolveIdx") Integer probSolveIdx);
+    List<Integer> getQIdxWithCategory(@Param("categoryCode") String categoryCode);
 
-    List<Integer> getQIdxWithCategory(@Param("categ_nm") String categoryName);
+    Integer getTgtTopic(@Param("memberNo") String memberNo);
+
+    List<TopicInfoRow> getTopicNamesWithQIdxs(@Param("qIdxs") List<Integer> qIdxs);
 }

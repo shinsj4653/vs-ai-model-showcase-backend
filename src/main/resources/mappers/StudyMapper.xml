@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="visang.showcase.aibackend.mapper.StudyMapper">
+    <!-- POST /recommend -->
+    <select id="getRecommendProblemWithQIdx" resultType="RecommendProblemDto" fetchSize="1000">
+        select tti.q_idx,
+               tpsr.prob_solve_idx,
+               tpsr.diff_level,
+               tpsr.correct,
+               tpsr.prob_no,
+               tpsr.prob_seq_no,
+               tti.topic_nm,
+               tti.categ_cd,
+               tti.categ_nm,
+               tti.chapter_nm,
+               tti.section_nm,
+               tti.subsection_nm,
+               tpi.imgpath,
+               tpi.mv_path as video_url
+        from ai_model_showcase.tb_member_info tmi
+        join ai_model_showcase.tb_prob_solve_result tpsr on tmi.member_no = tpsr.member_no
+        join ai_model_showcase.tb_prob_info tpi on tpsr.prob_no = tpi.prob_no
+        join ai_model_showcase.tb_topic_info tti on tpsr.q_idx = tti.q_idx
+        where tti.q_idx = #{qIdx}
+        order by tpsr.diff_level asc
+        limit 5;
+    </select>
+</mapper>

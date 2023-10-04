@@ -1,9 +1,14 @@
-package visang.showcase.aibackend.dto.response.diagnosis;
+package visang.showcase.aibackend.dto.response.study;
 
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 @Getter
-public class DiagnosisProblemDto {
+@AllArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+public class RecommendProblemDto {
     private Integer q_idx; // 토픽 인덱스
     private Integer prob_solve_idx; // 문제 풀이 문항 인덱스
     private Integer diff_level; // 난이도
@@ -17,4 +22,5 @@ public class DiagnosisProblemDto {
     private String section_nm; // 중단원 한글명
     private String subsection_nm; // 소단원 한글명
     private String imgpath; // 문제 이미지 url
+    private String video_url; // 문제 학습 동영상 url
 }
