@@ -88,7 +88,7 @@ public class DiagnosisService {
     /**
      * 트리톤 서버에 전송할 RequestBody 생성
      */
-    private KnowledgeLevelRequest createTritonRequest(String memberNo, DashboardRequest request) {
+    private KnowledgeLevelRequest createTritonRequest(String memberNo, DashboardRequest request, HttpServletRequest httpServletRequest) {
 
         List<DiagnosisProblemDto> preList = diagnosisMapper.getProblems(memberNo).subList(0, 85);
 
@@ -109,6 +109,10 @@ public class DiagnosisService {
 
         List<Integer> diff_level_list = mergedList.stream()
                 .map(m -> m.getDiff_level()).collect(Collectors.toList()); // 문제 난이도 리스트
+
+        // 정오답 리스트 -> 세션에 저장
+        HttpSession session = httpServletRequest.getSession();
+        session.setAttribute("diagnosisResult", correct_list);
 
         // INPUT__ 객체 생성
         List<KnowledgeReqObject> inputs = new ArrayList<>();
@@ -141,8 +145,9 @@ public class DiagnosisService {
      * @return DashboardDto 반환
      */
     public DashboardDto getDashBoardResult(String memberNo, DashboardRequest request, HttpServletRequest httpServletRequest) {
+
         // 트리톤 서버에 전송할 RequestBody 생성
-        KnowledgeLevelRequest tritonRequest = createTritonRequest(memberNo, request);
+        KnowledgeLevelRequest tritonRequest = createTritonRequest(memberNo, request, HttpServletRequest httpServletRequest);
         // RestTemplate을 사용하여 트리톤 지식상태 추론 서버의 응답 값 반환
         KnowledgeLevelResponse response = postWithKnowledgeLevelTriton(tritonRequest);
 
