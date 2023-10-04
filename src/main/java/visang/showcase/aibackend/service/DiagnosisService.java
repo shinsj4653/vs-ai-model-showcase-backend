@@ -36,9 +36,9 @@ public class DiagnosisService {
     // 100개의 문제에 해당하는 category_cd
     private Set<String> categories;
     // category_cd와 category_nm 매핑
-    private Map<String, String> categoryRecords = new HashMap<>();
+    private Map<String, String> categoryNames = new HashMap<>();
     // q_Idx와 topic_nm 매핑
-    private Map<Integer, String> topicRecords = new HashMap<>();
+    private Map<Integer, String> topicNames = new HashMap<>();
 
     private final DiagnosisMapper diagnosisMapper;
 
@@ -58,8 +58,8 @@ public class DiagnosisService {
     private void createProbMetaData(List<DiagnosisProblemDto> mergedList) {
         categories = mergedList.stream()
                 .map(prob -> {
-                    categoryRecords.putIfAbsent(prob.getCateg_cd(), prob.getCateg_nm());
-                    topicRecords.putIfAbsent(prob.getQ_idx(), prob.getTopic_nm());
+                    categoryNames.putIfAbsent(prob.getCateg_cd(), prob.getCateg_nm());
+                    topicNames.putIfAbsent(prob.getQ_idx(), prob.getTopic_nm());
                     return prob.getCateg_cd();
                 })
                 .filter(Objects::nonNull)
@@ -244,15 +244,11 @@ public class DiagnosisService {
      */
     private List<TopicCorrectRate> calculateTopicCorrectRates(DashboardRequest resultRequest) {
         Map<Integer, CorrectCounter> topicRecords = new HashMap<>();
-        Map<Integer, String> topicNames = new HashMap<>();
 
         for (DiagnosisProblemDto prob : resultRequest.getProb_list()) {
             int q_idx = prob.getQ_idx();
             int correct = prob.getCorrect();
-            String topic_nm = prob.getTopic_nm();
 
-            // q_idx와 topic_nm 매핑
-            topicNames.putIfAbsent(q_idx, topic_nm);
             topicRecords.putIfAbsent(q_idx, new CorrectCounter());
 
             if (correct == 0) { // 오답 count
@@ -295,7 +291,7 @@ public class DiagnosisService {
             // 소수점 둘째자리까지 반올림
             String knowledgeLevel = String.format("%.2f", avg);
 
-            areaKnowledges.add(new AreaKnowledgeResponse(categoryRecords.get(categoryCode), knowledgeLevel, "진단평가"));
+            areaKnowledges.add(new AreaKnowledgeResponse(categoryNames.get(categoryCode), knowledgeLevel, "진단평가"));
         }
 
         return areaKnowledges;
@@ -317,7 +313,7 @@ public class DiagnosisService {
         List<TopicKnowledge> topicKnowledges = new ArrayList<>();
         for (int qIdx : targetTopics) {
             Double knowledgeRate = knowledgeRates.get(qIdx);
-            topicKnowledges.add(new TopicKnowledge(qIdx, topicRecords.get(qIdx), knowledgeRate));
+            topicKnowledges.add(new TopicKnowledge(qIdx, topicNames.get(qIdx), knowledgeRate));
         }
 
         // 지식수준을 기준으로 내림차순 정렬
