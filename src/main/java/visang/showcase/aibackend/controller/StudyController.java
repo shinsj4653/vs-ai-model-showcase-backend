@@ -1,13 +1,17 @@
 package visang.showcase.aibackend.controller;
 
 import lombok.RequiredArgsConstructor;
+import org.apache.coyote.Response;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
 import visang.showcase.aibackend.dto.request.diagnosis.DashboardRequest;
 import visang.showcase.aibackend.dto.request.triton.KnowledgeLevelRequest;
 import visang.showcase.aibackend.dto.request.triton.KnowledgeReqObject;
+import visang.showcase.aibackend.dto.response.common.ResponseDto;
+import visang.showcase.aibackend.dto.response.common.ResponseUtil;
 import visang.showcase.aibackend.dto.response.diagnosis.DiagnosisProblemDto;
 import visang.showcase.aibackend.dto.response.study.RecommendProblemDto;
+import visang.showcase.aibackend.dto.response.study.StudyReadyDto;
 import visang.showcase.aibackend.mapper.DiagnosisMapper;
 import visang.showcase.aibackend.mapper.StudyMapper;
 import visang.showcase.aibackend.service.StudyService;
@@ -127,8 +131,8 @@ public class StudyController {
     }
 
     @GetMapping("/isReady")
-    public Boolean isStudyReady(HttpSession session) {
+    public ResponseDto<StudyReadyDto> isStudyReady(HttpSession session) {
         Double tgtTopicKnowledgeRate = (Double) session.getAttribute("tgtTopicKnowledgeRate");
-        return studyService.isStudyReady(tgtTopicKnowledgeRate);
+        return ResponseUtil.SUCCESS("학습 준비 완료 여부 반환 성공", studyService.isStudyReady(tgtTopicKnowledgeRate));
     }
 }
