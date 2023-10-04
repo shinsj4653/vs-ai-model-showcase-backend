@@ -53,4 +53,15 @@
         from ai_model_showcase.tb_member_info tmi
         where tmi.member_no = #{memberNo};
     </select>
+
+    <!-- GET /diagnosis/dashboard : 영역별 포함된 q_idx 값 가져오기 -->
+    <select id="getTopicNamesWithQIdxs" resultType="TopicInfoRow" parameterType="java.util.List" fetchSize="1000">
+        select tti.q_idx,
+        tti.topic_nm
+        from ai_model_showcase.tb_topic_info tti
+        where tti.q_idx in
+        <foreach collection="qIdxs" item="qIdx" open="(" separator="," close=")">
+            #{qIdx}
+        </foreach>
+    </select>
 </mapper>

@@ -5,7 +5,7 @@ import lombok.NoArgsConstructor;
 
 @Getter
 @NoArgsConstructor
-public class TopicKnowledge {
+public class TopicKnowledge implements Comparable<TopicKnowledge> {
 
     private Integer qIdx;
     private String topicNm;
@@ -19,5 +19,10 @@ public class TopicKnowledge {
 
     public Double getKnowledgeRate() {
         return knowledgeRate;
+    }
+
+    @Override
+    public int compareTo(TopicKnowledge other) {
+        return this.knowledgeRate.compareTo(other.knowledgeRate);
     }
 }

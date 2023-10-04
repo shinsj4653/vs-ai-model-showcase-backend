@@ -1,4 +1,4 @@
-package visang.showcase.aibackend.dto.response.triton;
+package visang.showcase.aibackend.dto.response.diagnosis.dashboard;
 
 import lombok.Getter;
 
