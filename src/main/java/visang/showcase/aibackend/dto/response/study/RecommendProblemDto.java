@@ -1,4 +1,4 @@
-package visang.showcase.aibackend.dto.response.recommend;
+package visang.showcase.aibackend.dto.response.study;
 
 import lombok.Getter;
 

@@ -7,9 +7,10 @@ import visang.showcase.aibackend.dto.request.diagnosis.DashboardRequest;
 import visang.showcase.aibackend.dto.request.triton.KnowledgeLevelRequest;
 import visang.showcase.aibackend.dto.request.triton.KnowledgeReqObject;
 import visang.showcase.aibackend.dto.response.diagnosis.DiagnosisProblemDto;
-import visang.showcase.aibackend.dto.response.recommend.RecommendProblemDto;
+import visang.showcase.aibackend.dto.response.study.RecommendProblemDto;
 import visang.showcase.aibackend.mapper.DiagnosisMapper;
 import visang.showcase.aibackend.mapper.StudyMapper;
+import visang.showcase.aibackend.service.StudyService;
 
 import javax.servlet.http.HttpSession;
 import java.util.ArrayList;
@@ -25,6 +26,7 @@ public class StudyController {
 
     private final DiagnosisMapper diagnosisMapper;
     private final StudyMapper studyMapper;
+    private final StudyService studyService;
 
     /**
      * RequestBody의 INPUT__ 요청 객체 생성
@@ -122,5 +124,11 @@ public class StudyController {
     @GetMapping("/recommend/prob/{prob_no}")
     public RecommendProblemDto getRecommendProb(@PathVariable String prob_no) {
         return studyMapper.getRecommendProblemWithProbNo(prob_no);
+    }
+
+    @GetMapping("/isReady")
+    public Boolean isStudyReady(HttpSession session) {
+        Double tgtTopicKnowledgeRate = (Double) session.getAttribute("tgtTopicKnowledgeRate");
+        return studyService.isStudyReady(tgtTopicKnowledgeRate);
     }
 }
