@@ -164,7 +164,6 @@ public class DiagnosisService {
         HttpSession session = httpServletRequest.getSession();
         session.setAttribute("tgtTopicKnowledgeRate", tgtTopicKnowledgeRate);
 
-
         return createDashBoardResponse(request, knowledgeRates);
     }
 

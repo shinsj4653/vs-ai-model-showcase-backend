@@ -6,6 +6,7 @@ import visang.showcase.aibackend.dto.request.diagnosis.DashboardRequest;
 import visang.showcase.aibackend.dto.request.study.StudyResultSaveRequest;
 import visang.showcase.aibackend.dto.response.common.ResponseDto;
 import visang.showcase.aibackend.dto.response.common.ResponseUtil;
+import visang.showcase.aibackend.dto.response.diagnosis.DiagnosisProblemDto;
 import visang.showcase.aibackend.dto.response.study.RecommendProblemDto;
 import visang.showcase.aibackend.dto.response.study.StudyReadyDto;
 import visang.showcase.aibackend.mapper.StudyMapper;
@@ -53,9 +54,10 @@ public class StudyController {
 //        return new KnowledgeLevelRequest(inputs);
 //    }
     @PostMapping("/recommend")
-    public ResponseDto<List<RecommendProblemDto>> recommendProb(HttpSession session, @RequestBody DashboardRequest request) {
+    public ResponseDto<List<RecommendProblemDto>> recommendProb(HttpSession session) {
         String memberNo = (String) session.getAttribute("memberNo");
-        return ResponseUtil.SUCCESS("학습준비에 필요한 문항 조회 성공", studyService.getStudyReadyProblems(memberNo, request));
+        List<DiagnosisProblemDto> probList = (List<DiagnosisProblemDto>) session.getAttribute("diagnosisResult");
+        return ResponseUtil.SUCCESS("학습준비에 필요한 문항 조회 성공", studyService.getStudyReadyProblems(memberNo, probList));
     }
 
 //    @GetMapping("/recommend/prob/{prob_no}")
