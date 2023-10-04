@@ -27,6 +27,9 @@ public class DiagnosisService {
     // 정답, 오답 카운트에 사용되는 KEY 값
     private static final String CORRECT_ANSWER_KEY = "yes";
     private static final String WRONG_ANSWER_KEY = "no";
+    // 강약 판단기준
+    public static final double THRESHOLD = 0.6;
+    // 토픽 총 개수
     private static final int TOTAL_TOPIC_COUNT = 317;
 
     // 100개의 문제에 해당하는 category_cd
@@ -315,8 +318,6 @@ public class DiagnosisService {
         // 지식수준을 기준으로 내림차순 정렬
         Collections.sort(topicKnowledges, Comparator.comparing(TopicKnowledge::getKnowledgeRate).reversed());
 
-        // 강약 판단기준
-        final double THRESHOLD = 0.5;
         // 강한 지식요인 3개 추출
         List<TopicKnowledge> strongKnowledges = topicKnowledges.stream()
                 .filter(topicKnowledge -> topicKnowledge.getKnowledgeRate() >= THRESHOLD)
