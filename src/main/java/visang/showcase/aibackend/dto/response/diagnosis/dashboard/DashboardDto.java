@@ -1,9 +1,6 @@
-package visang.showcase.aibackend.dto.response.diagnosis;
+package visang.showcase.aibackend.dto.response.diagnosis.dashboard;
 
 import lombok.Data;
-import visang.showcase.aibackend.dto.response.diagnosis.dashboard.DiffLevelCorrectRate;
-import visang.showcase.aibackend.dto.response.diagnosis.dashboard.TopicCorrectRate;
-import visang.showcase.aibackend.dto.response.triton.AreaKnowledgeResponse;
 import visang.showcase.aibackend.vo.TopicKnowledge;
 
 import java.util.List;
@@ -30,6 +27,6 @@ public class DashboardDto {
     private List<TopicKnowledge> weak_level;
 
     /* 앞으로 배울 토픽 예상 지식 수준 */
-    private List<Object> future_topic_level_expectation;
+    private List<ExpectedTopicResponse> future_topic_level_expectation;
 
 }
