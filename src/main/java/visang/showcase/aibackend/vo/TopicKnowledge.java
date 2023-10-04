@@ -1,9 +1,12 @@
 package visang.showcase.aibackend.vo;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 
+@Getter
+@NoArgsConstructor
 public class TopicKnowledge {
-    @JsonIgnore
+
     private Integer qIdx;
     private String topicNm;
     private Double knowledgeRate;
