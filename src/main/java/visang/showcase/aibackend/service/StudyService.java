@@ -6,6 +6,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 import visang.showcase.aibackend.controller.RecommendProbResponse;
 import visang.showcase.aibackend.dto.request.diagnosis.DashboardRequest;
+import visang.showcase.aibackend.dto.request.study.StudyResultSaveRequest;
 import visang.showcase.aibackend.dto.request.triton.KnowledgeLevelRequest;
 import visang.showcase.aibackend.dto.request.triton.KnowledgeReqObject;
 import visang.showcase.aibackend.dto.response.diagnosis.DiagnosisProblemDto;
@@ -51,12 +52,13 @@ public class StudyService {
         return studyMapper.getRecommendProblemWithQIdx(studyReadyTopicIdx);
     }
 
-    public List<Integer> setStudyReadyProblems(List<RecommendProblemDto> probs, HttpServletRequest request) {
-        List<Integer> correct_list = probs.stream()
+    public List<Integer> setStudyReadyProblems(StudyResultSaveRequest request, HttpServletRequest httpServletRequest) {
+        List<Integer> correct_list = request.getProb_list()
+                .stream()
                 .map(m -> m.getCorrect()).collect(Collectors.toList()); // 정오답 리스트
 
         // 학습준비 문제 풀이 시퀀스 -> 세션에 저장
-        HttpSession session = request.getSession();
+        HttpSession session = httpServletRequest.getSession();
         session.setAttribute("studyReadyResult", correct_list);
 
         return correct_list;

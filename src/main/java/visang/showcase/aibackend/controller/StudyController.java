@@ -1,35 +1,25 @@
 package visang.showcase.aibackend.controller;
 
 import lombok.RequiredArgsConstructor;
-import org.apache.coyote.Response;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.client.RestTemplate;
 import visang.showcase.aibackend.dto.request.diagnosis.DashboardRequest;
-import visang.showcase.aibackend.dto.request.triton.KnowledgeLevelRequest;
-import visang.showcase.aibackend.dto.request.triton.KnowledgeReqObject;
+import visang.showcase.aibackend.dto.request.study.StudyResultSaveRequest;
 import visang.showcase.aibackend.dto.response.common.ResponseDto;
 import visang.showcase.aibackend.dto.response.common.ResponseUtil;
-import visang.showcase.aibackend.dto.response.diagnosis.DiagnosisProblemDto;
 import visang.showcase.aibackend.dto.response.study.RecommendProblemDto;
 import visang.showcase.aibackend.dto.response.study.StudyReadyDto;
-import visang.showcase.aibackend.mapper.DiagnosisMapper;
 import visang.showcase.aibackend.mapper.StudyMapper;
 import visang.showcase.aibackend.service.StudyService;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
-import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("study")
 public class StudyController {
 
-    private final StudyMapper studyMapper;
     private final StudyService studyService;
 
     /**
@@ -62,9 +52,6 @@ public class StudyController {
 //
 //        return new KnowledgeLevelRequest(inputs);
 //    }
-
-
-
     @PostMapping("/recommend")
     public ResponseDto<List<RecommendProblemDto>> recommendProb(HttpSession session, @RequestBody DashboardRequest request) {
         String memberNo = (String) session.getAttribute("memberNo");
@@ -81,5 +68,10 @@ public class StudyController {
         Double tgtTopicKnowledgeRate = (Double) session.getAttribute("tgtTopicKnowledgeRate");
         System.out.println(tgtTopicKnowledgeRate);
         return ResponseUtil.SUCCESS("학습 준비 완료 여부 반환 성공", studyService.isStudyReady(tgtTopicKnowledgeRate));
+    }
+
+    @PostMapping("/setResult")
+    public ResponseDto<List<Integer>> setStudyReadyProblems(@RequestBody StudyResultSaveRequest request, HttpServletRequest httpServletRequest) {
+        return ResponseUtil.SUCCESS("학습준비에 필요한 문항 조회 성공", studyService.setStudyReadyProblems(request, httpServletRequest));
     }
 }
