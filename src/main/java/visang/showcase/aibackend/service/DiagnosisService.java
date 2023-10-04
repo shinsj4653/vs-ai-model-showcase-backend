@@ -95,7 +95,7 @@ public class DiagnosisService {
         List<DiagnosisProblemDto> mergedList = Stream.of(preList, request.getProb_list())
                 .flatMap(Collection::stream)
                 .collect(Collectors.toList());
-
+      
         // 문제 100개에 해당하는 category_cd 데이터 저장
         // category, topic 매핑데이터 생성
         createProbMetaData(mergedList);
@@ -154,6 +154,7 @@ public class DiagnosisService {
         List<Double> knowledgeRates = response.getOutputs()
                 .get(0)
                 .getData();
+
 
         // 멤버의 타깃 토픽에 대한 지식 수준 -> 세션에 저장하기
         Integer tgtTopic = diagnosisMapper.getTgtTopic(memberNo);
