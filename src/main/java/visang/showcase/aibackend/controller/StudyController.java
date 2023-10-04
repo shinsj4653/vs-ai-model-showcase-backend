@@ -53,7 +53,7 @@ public class StudyController {
 //
 //        return new KnowledgeLevelRequest(inputs);
 //    }
-    @PostMapping("/recommend")
+    @GetMapping("/recommend")
     public ResponseDto<List<RecommendProblemDto>> recommendProb(HttpSession session) {
         String memberNo = (String) session.getAttribute("memberNo");
         List<DiagnosisProblemDto> probList = (List<DiagnosisProblemDto>) session.getAttribute("diagnosisResult");
