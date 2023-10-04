@@ -4,7 +4,9 @@ import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 import visang.showcase.aibackend.dto.response.study.RecommendProblemDto;
 
+import java.util.List;
+
 @Mapper
 public interface StudyMapper {
-    RecommendProblemDto getRecommendProblemWithProbNo(@Param("prob_no") String prob_no);
+    List<RecommendProblemDto> getRecommendProblemWithQIdx(@Param("qIdx") Integer qIdx);
 }
