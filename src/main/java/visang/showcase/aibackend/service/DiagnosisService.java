@@ -100,6 +100,10 @@ public class DiagnosisService {
         // category, topic 매핑데이터 생성
         createProbMetaData(mergedList);
 
+        // 문제 100개에 해당하는 리스트 -> 세션에 저장
+        HttpSession session = httpServletRequest.getSession();
+        session.setAttribute("diagnosisResult", mergedList);
+
         List<Integer> q_idx_list = mergedList.stream()
                 .map(m -> m.getQ_idx()).collect(Collectors.toList());  // 토픽 리스트
 
@@ -108,10 +112,6 @@ public class DiagnosisService {
 
         List<Integer> diff_level_list = mergedList.stream()
                 .map(m -> m.getDiff_level()).collect(Collectors.toList()); // 문제 난이도 리스트
-
-        // 정오답 리스트 -> 세션에 저장
-        HttpSession session = httpServletRequest.getSession();
-        session.setAttribute("diagnosisResult", correct_list);
 
         // INPUT__ 객체 생성
         List<KnowledgeReqObject> inputs = new ArrayList<>();
@@ -163,6 +163,7 @@ public class DiagnosisService {
         // 세션을 얻어와서 tgtTopicKnowledgeRate 값을 세션에 저장
         HttpSession session = httpServletRequest.getSession();
         session.setAttribute("tgtTopicKnowledgeRate", tgtTopicKnowledgeRate);
+
 
         return createDashBoardResponse(request, knowledgeRates);
     }
