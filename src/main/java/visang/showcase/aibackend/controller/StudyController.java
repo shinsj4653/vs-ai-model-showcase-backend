@@ -38,7 +38,7 @@ public class StudyController {
     }
 
     @PostMapping("/setResult")
-    public ResponseDto<List<Integer>> setStudyReadyProblems(@RequestBody StudyResultSaveRequest request, HttpServletRequest httpServletRequest) {
+    public ResponseDto<List<RecommendProblemDto>> setStudyReadyProblems(@RequestBody StudyResultSaveRequest request, HttpServletRequest httpServletRequest) {
         return ResponseUtil.SUCCESS("학습준비 문제 풀이 시퀀스 세션에 저장 성공", studyService.setStudyReadyProblems(request, httpServletRequest));
     }
 

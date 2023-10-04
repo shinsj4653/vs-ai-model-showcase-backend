@@ -52,16 +52,16 @@ public class StudyService {
         return studyMapper.getRecommendProblemWithQIdx(studyReadyTopicIdx);
     }
 
-    public List<Integer> setStudyReadyProblems(StudyResultSaveRequest request, HttpServletRequest httpServletRequest) {
-        List<Integer> correct_list = request.getProb_list()
-                .stream()
-                .map(m -> m.getCorrect()).collect(Collectors.toList()); // 정오답 리스트
+    public List<RecommendProblemDto> setStudyReadyProblems(StudyResultSaveRequest request, HttpServletRequest httpServletRequest) {
+
+        // 학습준비 문제 풀이 시퀀스
+        List<RecommendProblemDto> probList = request.getProb_list();
 
         // 학습준비 문제 풀이 시퀀스 -> 세션에 저장
         HttpSession session = httpServletRequest.getSession();
-        session.setAttribute("studyReadyResult", correct_list);
+        session.setAttribute("studyReadyResult", probList);
 
-        return correct_list;
+        return probList;
     }
 
     /**
