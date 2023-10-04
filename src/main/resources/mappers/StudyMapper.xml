@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="visang.showcase.aibackend.mapper.StudyMapper">
+    <!-- POST /recommend -->
+    <select id="getRecommendProblemWithProbNo" resultType="RecommendProblemDto" fetchSize="1000">
+        select tti.q_idx,
+               tpi.prob_no,
+               tpi.main_prob_diff as prob_diff,
+               tti.topic_nm,
+               tti.categ_cd,
+               tti.categ_nm,
+               tti.chapter_nm,
+               tti.section_nm,
+               tti.subsection_nm,
+               tpi.imgpath,
+               tpi.mv_path        as video_url
+        from ai_model_showcase.tb_prob_info tpi
+                 join ai_model_showcase.tb_topic_info tti on tpi.q_idx = tti.q_idx
+        where tpi.prob_no = #{prob_no};
+    </select>
+</mapper>
