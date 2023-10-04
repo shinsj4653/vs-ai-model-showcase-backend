@@ -7,13 +7,8 @@ import org.springframework.web.client.RestTemplate;
 import visang.showcase.aibackend.dto.request.diagnosis.DashboardRequest;
 import visang.showcase.aibackend.dto.request.triton.KnowledgeLevelRequest;
 import visang.showcase.aibackend.dto.request.triton.KnowledgeReqObject;
-import visang.showcase.aibackend.dto.response.diagnosis.DashboardDto;
 import visang.showcase.aibackend.dto.response.diagnosis.DiagnosisProblemDto;
-import visang.showcase.aibackend.dto.response.diagnosis.dashboard.DiffLevelCorrectRate;
-import visang.showcase.aibackend.dto.response.diagnosis.dashboard.StrongWeakKnowledgeResponse;
-import visang.showcase.aibackend.dto.response.diagnosis.dashboard.TopicCorrectRate;
-import visang.showcase.aibackend.dto.response.diagnosis.dashboard.WholeCorrectRate;
-import visang.showcase.aibackend.dto.response.triton.AreaKnowledgeResponse;
+import visang.showcase.aibackend.dto.response.diagnosis.dashboard.*;
 import visang.showcase.aibackend.dto.response.triton.KnowledgeLevelResponse;
 import visang.showcase.aibackend.mapper.DiagnosisMapper;
 import visang.showcase.aibackend.vo.CorrectCounter;
@@ -32,6 +27,7 @@ public class DiagnosisService {
     // 정답, 오답 카운트에 사용되는 KEY 값
     private static final String CORRECT_ANSWER_KEY = "yes";
     private static final String WRONG_ANSWER_KEY = "no";
+    private static final int TOTAL_TOPIC_COUNT = 317;
 
     // 100개의 문제에 해당하는 category_cd
     private Set<String> categories;
@@ -175,7 +171,9 @@ public class DiagnosisService {
         StrongWeakKnowledgeResponse strongWeakKnowledgeResponse = calculateKnowledgeStrength(request, knowledgeRates);
         result.setStrong_level(strongWeakKnowledgeResponse.getStrong_level());
         result.setWeak_level(strongWeakKnowledgeResponse.getWeak_level());
-
+        // 앞으로 배울 토픽의 예상 지식 수준
+        List<ExpectedTopicResponse> expectedTopics = calculateExpectedKnowledgeLevel(request, knowledgeRates);
+        result.setFuture_topic_level_expectation(expectedTopics);
         return result;
     }
 
@@ -333,5 +331,36 @@ public class DiagnosisService {
                 .collect(Collectors.toList());
 
         return new StrongWeakKnowledgeResponse(strongKnowledges, weakKnowledges);
+    }
+
+    /**
+     * 앞으로 배울 토픽의 예상 지식 수준 계산
+     *
+     * @param request        진단평가 결과 데이터
+     * @param knowledgeRates 트리톤 서버에서 받은 지식수준 추론 결과
+     * @return List<ExpectedTopicResponse> 반환
+     */
+    private List<ExpectedTopicResponse> calculateExpectedKnowledgeLevel(DashboardRequest request, List<Double> knowledgeRates) {
+        // 진단평가 마지막 문제 토픽 추출
+        int lastIdx = request.getProb_list().size() - 1;
+        int lastQIdx = request.getProb_list().get(lastIdx).getQ_idx();
+
+        // 5개의 다음 토픽 인덱스 계산
+        List<Integer> nextQIdxs = new ArrayList<>();
+        for (int i = 1; i <= 5; i++) {
+            int nextQIdx = (lastQIdx + i) % TOTAL_TOPIC_COUNT; // 0 ~ 316
+            nextQIdxs.add(nextQIdx);
+        }
+
+        // 다음 토픽 5개애 해당하는 지식수준 추출
+        List<ExpectedTopicResponse> result = new ArrayList<>();
+
+        // 토픽 인덱스에 해당하는 토픽이름 데이터 조회
+        List<String> topicNames = diagnosisMapper.getTopicNamesWithQIdxs(nextQIdxs);
+        for (int i = 0; i < 5; i++) {
+            result.add(new ExpectedTopicResponse(topicNames.get(i), knowledgeRates.get(nextQIdxs.get(i))));
+        }
+
+        return result;
     }
 }

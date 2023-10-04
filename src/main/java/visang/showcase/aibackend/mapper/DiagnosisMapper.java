@@ -9,5 +9,8 @@ import java.util.List;
 @Mapper
 public interface DiagnosisMapper {
     List<DiagnosisProblemDto> getProblems(@Param("memberNo") String memberNo);
+
     List<Integer> getQIdxWithCategory(@Param("categoryCode") String categoryCode);
+
+    List<String> getTopicNamesWithQIdxs(@Param("qIdxs") List<Integer> qIdxs);
 }
