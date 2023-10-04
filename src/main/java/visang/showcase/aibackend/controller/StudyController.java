@@ -72,6 +72,6 @@ public class StudyController {
 
     @PostMapping("/setResult")
     public ResponseDto<List<Integer>> setStudyReadyProblems(@RequestBody StudyResultSaveRequest request, HttpServletRequest httpServletRequest) {
-        return ResponseUtil.SUCCESS("학습준비에 필요한 문항 조회 성공", studyService.setStudyReadyProblems(request, httpServletRequest));
+        return ResponseUtil.SUCCESS("학습준비 문제 풀이 시퀀스 세션에 저장 성공", studyService.setStudyReadyProblems(request, httpServletRequest));
     }
 }
