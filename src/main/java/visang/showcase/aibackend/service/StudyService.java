@@ -51,6 +51,17 @@ public class StudyService {
         return studyMapper.getRecommendProblemWithQIdx(studyReadyTopicIdx);
     }
 
+    public List<Integer> setStudyReadyProblems(List<RecommendProblemDto> probs, HttpServletRequest request) {
+        List<Integer> correct_list = probs.stream()
+                .map(m -> m.getCorrect()).collect(Collectors.toList()); // 정오답 리스트
+
+        // 학습준비 문제 풀이 시퀀스 -> 세션에 저장
+        HttpSession session = request.getSession();
+        session.setAttribute("studyReadyResult", correct_list);
+
+        return correct_list;
+    }
+
     /**
      * 트리톤 서버에 전송할 RequestBody 생성
      */

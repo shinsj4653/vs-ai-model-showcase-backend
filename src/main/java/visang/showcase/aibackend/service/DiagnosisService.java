@@ -147,7 +147,7 @@ public class DiagnosisService {
     public DashboardDto getDashBoardResult(String memberNo, DashboardRequest request, HttpServletRequest httpServletRequest) {
 
         // 트리톤 서버에 전송할 RequestBody 생성
-        KnowledgeLevelRequest tritonRequest = createTritonRequest(memberNo, request, HttpServletRequest httpServletRequest);
+        KnowledgeLevelRequest tritonRequest = createTritonRequest(memberNo, request, httpServletRequest);
         // RestTemplate을 사용하여 트리톤 지식상태 추론 서버의 응답 값 반환
         KnowledgeLevelResponse response = postWithKnowledgeLevelTriton(tritonRequest);
 
