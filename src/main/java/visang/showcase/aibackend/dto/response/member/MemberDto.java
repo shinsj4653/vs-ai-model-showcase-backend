@@ -8,7 +8,7 @@ import visang.showcase.aibackend.util.SubjectCodeTransformer;
 @Builder
 public class MemberDto {
     public String member_no; // 학생 번호
-    public String tgt_topic; // 타켓 토픽 번호
+    public Integer tgt_topic; // 타켓 토픽 번호
     public String topic_nm; // 토픽단원명
     public String subject_nm;  // 학년, 학기 정보 (ex 초4-1)
 
