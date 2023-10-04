@@ -278,9 +278,7 @@ public class DiagnosisService {
         List<AreaKnowledgeResponse> areaKnowledges = new ArrayList<>();
         // 영역 셋을 순환하면서 영역
         for (String categoryCode : categories) {
-//            System.out.println(categoryCode);
             List<Integer> qIdxs = diagnosisMapper.getQIdxWithCategory(categoryCode);
-//            System.out.println(qIdxs);
             // 영역에 해당하는 토픽들의 지식수준의 합계 계산
             Double sum = qIdxs.stream()
                     .map(qIdx -> knowledgeRates.get(qIdx))
