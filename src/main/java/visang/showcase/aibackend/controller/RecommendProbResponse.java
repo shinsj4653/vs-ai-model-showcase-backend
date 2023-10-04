@@ -16,4 +16,5 @@ public class RecommendProbResponse implements Serializable {
     private String model_name;
     private String model_version;
     private List<RecommendResObj> outputs;
+
 }
