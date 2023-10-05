@@ -23,6 +23,13 @@ public class SessionFilter implements Filter {
         HttpSession session = httpRequest.getSession(true); // 세션이 없으면 새로 생성
         String requestUri = httpRequest.getRequestURI();
 
+        httpResponse.setHeader("Access-Control-Allow-Origin", "*");
+        httpResponse.setHeader("Access-Control-Allow-Credentials", "true");
+        httpResponse.setHeader("Access-Control-Allow-Methods","*");
+        httpResponse.setHeader("Access-Control-Max-Age", "3600");
+        httpResponse.setHeader("Access-Control-Allow-Headers",
+                "Origin, X-Requested-With, Content-Type, Accept, Authorization");
+
         // 세션에 memberNo 값이 없는 경우에 대한 처리 필요.
         if (!requestUri.startsWith("/members") &&
                 !requestUri.equals("/")
