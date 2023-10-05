@@ -32,13 +32,13 @@ public class StudyService {
     private final StudyMapper studyMapper;
 
     // 학습준비 이행 가능 여부 판단 기준이 되는 지식 수준
-    public static final double THRESHOLD = 3.0;
+    public static final double THRESHOLD = 0.6;
     
     public StudyReadyDto isStudyReady(Double tgtTopicKnowledgeRate){
-        // 타켓토픽의 지식 수준이 3.0을 넘으면 학습준비를 할 필요가 없다
+        // 타켓토픽의 지식 수준이 기준을 넘으면 학습준비를 할 필요가 없다
         if (tgtTopicKnowledgeRate >= THRESHOLD)
             return new StudyReadyDto(false);
-        else // 3.0을 못 넘겼을 시에는 학습 준비를 해야 한다
+        else // 기준을 못 넘겼을 시에는 학습 준비를 해야 한다
             return new StudyReadyDto(true);
     }
 
