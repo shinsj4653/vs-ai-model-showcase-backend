@@ -17,8 +17,6 @@ mybatis: # type을 쉽게 쓰기 위해서 dto 패키지를 type-aliaes에 설�
 server:
   servlet:
     session:
-      cookie:
-        same-site: none
       timeout: 1800
       cookie:
         same-site: "none"
