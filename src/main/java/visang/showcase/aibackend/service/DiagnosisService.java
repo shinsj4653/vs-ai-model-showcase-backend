@@ -30,9 +30,13 @@ public class DiagnosisService {
     private static final String CORRECT_ANSWER_KEY = "yes";
     private static final String WRONG_ANSWER_KEY = "no";
     // 강약 판단기준
-    public static final double THRESHOLD = 0.6;
+    private static final double THRESHOLD = 0.6;
     // 토픽 총 개수
     private static final int TOTAL_TOPIC_COUNT = 317;
+    // 트리톤 서버 URL
+    private static final String TRITON_SERVER_URL = "http://106.241.14.35:8000";
+    // 추론 기능 URI
+    private static final String INFERENCE_URI = "/v2/models/gkt_last/infer";
 
     // 100개의 문제에 해당하는 category_cd
     private Set<String> categories;
@@ -95,7 +99,7 @@ public class DiagnosisService {
         List<DiagnosisProblemDto> mergedList = Stream.of(preList, request.getProb_list())
                 .flatMap(Collection::stream)
                 .collect(Collectors.toList());
-      
+
         // 문제 100개에 해당하는 category_cd 데이터 저장
         // category, topic 매핑데이터 생성
         createProbMetaData(mergedList);
@@ -131,7 +135,7 @@ public class DiagnosisService {
     private KnowledgeLevelResponse postWithKnowledgeLevelTriton(KnowledgeLevelRequest request) {
 
         RestTemplate restTemplate = new RestTemplate();
-        KnowledgeLevelResponse responseEntity = restTemplate.postForObject("http://106.241.14.35:8000" + "/v2/models/gkt/infer", request, KnowledgeLevelResponse.class);
+        KnowledgeLevelResponse responseEntity = restTemplate.postForObject(TRITON_SERVER_URL + INFERENCE_URI, request, KnowledgeLevelResponse.class);
 
         return responseEntity;
     }
