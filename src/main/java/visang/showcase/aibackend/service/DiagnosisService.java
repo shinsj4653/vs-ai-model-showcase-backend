@@ -30,7 +30,7 @@ public class DiagnosisService {
     private static final String CORRECT_ANSWER_KEY = "yes";
     private static final String WRONG_ANSWER_KEY = "no";
     // 강약 판단기준
-    public static final double THRESHOLD = 0.6;
+    public static final double THRESHOLD = 3.0;
     // 토픽 총 개수
     private static final int TOTAL_TOPIC_COUNT = 317;
 
@@ -304,7 +304,7 @@ public class DiagnosisService {
             // 지식수준의 평균 계산
             Double avg = sum / qIdxs.size();
             // 소수점 둘째자리까지 반올림
-            String knowledgeLevel = String.format("%.2f", avg);
+            Double knowledgeLevel = Double.valueOf(String.format("%.2f", avg));
 
             areaKnowledges.add(new AreaKnowledgeResponse(categoryNames.get(categoryCode), knowledgeLevel, "진단평가"));
         }
