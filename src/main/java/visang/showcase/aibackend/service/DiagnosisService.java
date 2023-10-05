@@ -304,7 +304,7 @@ public class DiagnosisService {
             // 지식수준의 평균 계산
             Double avg = sum / qIdxs.size();
             // 소수점 둘째자리까지 반올림
-            String knowledgeLevel = String.format("%.2f", avg);
+            Double knowledgeLevel = Double.valueOf(String.format("%.2f", avg));
 
             areaKnowledges.add(new AreaKnowledgeResponse(categoryNames.get(categoryCode), knowledgeLevel, "진단평가"));
         }
