@@ -20,3 +20,6 @@ server:
       cookie:
         same-site: none
       timeout: 1800
+      cookie:
+        same-site: "none"
+        secure : true
