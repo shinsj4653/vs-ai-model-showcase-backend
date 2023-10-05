@@ -36,8 +36,13 @@ public class SessionFilter implements Filter {
                 && (session.getAttribute("memberNo") == null)) {
 
             // Redirect to the root IP address
-            httpResponse.sendRedirect("/"); // Change this to your desired root URL
-            System.out.println("redirect to first page!!");
+            // 오류 응답을 반환합니다.
+            httpResponse.setStatus(HttpServletResponse.SC_UNAUTHORIZED); // 401 Unauthorized 상태 코드 설정
+            httpResponse.getWriter().write("세션이 없습니다. 학생을 선택해주세요"); // 오류 메시지 설정
+            httpResponse.getWriter().flush();
+            httpResponse.getWriter().close();
+
+            System.out.println("세션이 없습니다. 학생을 선택해주세요");
             return;
 
         } else {
