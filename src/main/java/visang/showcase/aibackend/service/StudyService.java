@@ -38,8 +38,8 @@ public class StudyService {
             return new StudyReadyDto(false);
     }
 
-    public List<RecommendProblemDto> getStudyReadyProblems(String memberNo, DashboardRequest request) {
-        KnowledgeLevelRequest recommendProbRequest = createTritonRequest(memberNo, request);
+    public List<RecommendProblemDto> getStudyReadyProblems(String memberNo, List<DiagnosisProblemDto> probList) {
+        KnowledgeLevelRequest recommendProbRequest = createTritonRequest(memberNo, probList);
         RecommendProbResponse recommendProbResponse = postWithRecommendTriton(recommendProbRequest);
 
         // 학습준비에 필요한 토픽 배열의 맨 첫 토픽Idx 가져오기
@@ -52,37 +52,34 @@ public class StudyService {
         return studyMapper.getRecommendProblemWithQIdx(studyReadyTopicIdx);
     }
 
-    public List<Integer> setStudyReadyProblems(StudyResultSaveRequest request, HttpServletRequest httpServletRequest) {
-        List<Integer> correct_list = request.getProb_list()
-                .stream()
-                .map(m -> m.getCorrect()).collect(Collectors.toList()); // 정오답 리스트
+    public List<RecommendProblemDto> setStudyReadyProblems(StudyResultSaveRequest request, HttpServletRequest httpServletRequest) {
+
+        // 학습준비 문제 풀이 시퀀스
+        List<RecommendProblemDto> probList = request.getProb_list();
 
         // 학습준비 문제 풀이 시퀀스 -> 세션에 저장
         HttpSession session = httpServletRequest.getSession();
-        session.setAttribute("studyReadyResult", correct_list);
+        session.setAttribute("studyReadyResult", probList);
 
-        return correct_list;
+        return probList;
     }
 
     /**
      * 트리톤 서버에 전송할 RequestBody 생성
      */
-    private KnowledgeLevelRequest createTritonRequest(String memberNo, DashboardRequest request) {
-        List<DiagnosisProblemDto> preList = diagnosisMapper.getProblems(memberNo).subList(0, 85);
+    private KnowledgeLevelRequest createTritonRequest(String memberNo, List<DiagnosisProblemDto> probList) {
+        
+        // memberNo에 해당하는 tgt_topic 값 가져오기
         Integer tgtTopic = diagnosisMapper.getTgtTopic(memberNo);
-
-        // 앞의 85문제 + 학생 진단 후의 15문제 => 총 100 문제
-        List<DiagnosisProblemDto> mergedList = Stream.of(preList, request.getProb_list())
-                .flatMap(Collection::stream)
-                .collect(Collectors.toList());
-
-        List<Integer> q_idx_list = mergedList.stream()
+    
+        // 세션에 저장된 진단평가 100문항에서 필요한 정보 사용
+        List<Integer> q_idx_list = probList.stream()
                 .map(m -> m.getQ_idx()).collect(Collectors.toList());  // 토픽 리스트
 
-        List<Integer> correct_list = mergedList.stream()
+        List<Integer> correct_list = probList.stream()
                 .map(m -> m.getCorrect()).collect(Collectors.toList()); // 정오답 리스트
 
-        List<Integer> diff_level_list = mergedList.stream()
+        List<Integer> diff_level_list = probList.stream()
                 .map(m -> m.getDiff_level()).collect(Collectors.toList()); // 문제 난이도 리스트
 
         // INPUT__ 객체 생성
@@ -90,6 +87,7 @@ public class StudyService {
         inputs.add(createRequestObj(0, q_idx_list));
         inputs.add(createRequestObj(1, correct_list));
         inputs.add(createRequestObj(2, diff_level_list));
+
         // 옵션 값 추가
         inputs.add(createRequestObj(3, List.of(tgtTopic, 5, 1, 5, 5)));
 
