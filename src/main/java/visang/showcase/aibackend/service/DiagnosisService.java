@@ -131,7 +131,7 @@ public class DiagnosisService {
     private KnowledgeLevelResponse postWithKnowledgeLevelTriton(KnowledgeLevelRequest request) {
 
         RestTemplate restTemplate = new RestTemplate();
-        KnowledgeLevelResponse responseEntity = restTemplate.postForObject("http://10.214.2.33:8000" + "/v2/models/gkt/infer", request, KnowledgeLevelResponse.class);
+        KnowledgeLevelResponse responseEntity = restTemplate.postForObject("http://106.241.14.35:8000" + "/v2/models/gkt/infer", request, KnowledgeLevelResponse.class);
 
         return responseEntity;
     }
