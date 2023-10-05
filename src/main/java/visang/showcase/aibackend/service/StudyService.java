@@ -113,7 +113,7 @@ public class StudyService {
 
     private RecommendProbResponse postWithRecommendTriton(KnowledgeLevelRequest request) {
         RestTemplate restTemplate = new RestTemplate();
-        RecommendProbResponse response = restTemplate.postForObject("http://10.214.2.33:8000" + "/v2/models/gkt_reco/infer", request, RecommendProbResponse.class);
+        RecommendProbResponse response = restTemplate.postForObject("http://106.241.14.35:8000" + "/v2/models/gkt_reco/infer", request, RecommendProbResponse.class);
         return response;
     }
 }
