@@ -5,7 +5,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 import visang.showcase.aibackend.controller.RecommendProbResponse;
-import visang.showcase.aibackend.dto.request.diagnosis.DashboardRequest;
 import visang.showcase.aibackend.dto.request.study.StudyResultSaveRequest;
 import visang.showcase.aibackend.dto.request.triton.KnowledgeLevelRequest;
 import visang.showcase.aibackend.dto.request.triton.KnowledgeReqObject;
@@ -18,23 +17,25 @@ import visang.showcase.aibackend.mapper.StudyMapper;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 @Slf4j
 @Service
 @RequiredArgsConstructor
 public class StudyService {
+    // 트리톤 서버 URL
+    private static final String TRITON_SERVER_URL = "http://106.241.14.35:8000";
+    // 추천 기능 URI
+    private static final String RECOMMEND_URI = "/v2/models/gkt_reco/infer";
 
     private final DiagnosisMapper diagnosisMapper;
     private final StudyMapper studyMapper;
 
     // 학습준비 이행 가능 여부 판단 기준이 되는 지식 수준
     public static final double THRESHOLD = 0.6;
-    
-    public StudyReadyDto isStudyReady(Double tgtTopicKnowledgeRate){
+
+    public StudyReadyDto isStudyReady(Double tgtTopicKnowledgeRate) {
         // 타켓토픽의 지식 수준이 기준을 넘으면 학습준비를 할 필요가 없다
         if (tgtTopicKnowledgeRate >= THRESHOLD)
             return new StudyReadyDto(false);
@@ -51,7 +52,7 @@ public class StudyService {
                 .get(1)
                 .getData()
                 .get(0);
-        
+
         // 토픽 Idx에 해당하는 문항 5개 가져오기
         return studyMapper.getRecommendProblemWithQIdx(studyReadyTopicIdx);
     }
@@ -72,10 +73,10 @@ public class StudyService {
      * 트리톤 서버에 전송할 RequestBody 생성
      */
     private KnowledgeLevelRequest createTritonRequest(String memberNo, List<DiagnosisProblemDto> probList) {
-        
+
         // memberNo에 해당하는 tgt_topic 값 가져오기
         Integer tgtTopic = diagnosisMapper.getTgtTopic(memberNo);
-    
+
         // 세션에 저장된 진단평가 100문항에서 필요한 정보 사용
         List<Integer> q_idx_list = probList.stream()
                 .map(m -> m.getQ_idx()).collect(Collectors.toList());  // 토픽 리스트
@@ -117,7 +118,7 @@ public class StudyService {
 
     private RecommendProbResponse postWithRecommendTriton(KnowledgeLevelRequest request) {
         RestTemplate restTemplate = new RestTemplate();
-        RecommendProbResponse response = restTemplate.postForObject("http://106.241.14.35:8000" + "/v2/models/gkt_reco/infer", request, RecommendProbResponse.class);
+        RecommendProbResponse response = restTemplate.postForObject(TRITON_SERVER_URL + RECOMMEND_URI, request, RecommendProbResponse.class);
         return response;
     }
 }
