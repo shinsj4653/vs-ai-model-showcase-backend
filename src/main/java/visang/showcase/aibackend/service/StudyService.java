@@ -31,11 +31,11 @@ public class StudyService {
     private final DiagnosisMapper diagnosisMapper;
     private final StudyMapper studyMapper;
     public StudyReadyDto isStudyReady(Double tgtTopicKnowledgeRate){
-        // 타켓토픽의 지식 수준이 특정 기준을 못 넘길시, 학습할 준비가 안되었다고 판단
+        // 타켓토픽의 지식 수준이 0.6을 넘으면 학습준비를 할 필요가 없다
         if (tgtTopicKnowledgeRate >= 0.6)
-            return new StudyReadyDto(true);
-        else
             return new StudyReadyDto(false);
+        else // 0.6을 못 넘겼을 시에는 학습 준비를 해야 한다
+            return new StudyReadyDto(true);
     }
 
     public List<RecommendProblemDto> getStudyReadyProblems(String memberNo, List<DiagnosisProblemDto> probList) {
