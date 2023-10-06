@@ -22,8 +22,7 @@ server:
       timeout: 1800
       cookie:
         same-site: "none"
-        secure : true
-
+        
 security:
   jwt:
     token:
