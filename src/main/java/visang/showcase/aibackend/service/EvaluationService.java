@@ -33,7 +33,7 @@ public class EvaluationService {
     // 추론 기능 URI
     private static final String INFERENCE_URI = "/v2/models/gkt_last/infer";
     // 타겟토픽 지식수준의 기준값
-    public static final double EVALUATION_THRESHHOLD = 0.7;
+    public static final double EVALUATION_THRESHHOLD = 4.0;
 
     private final EvaluationMapper evaluationMapper;
     private final DiagnosisMapper diagnosisMapper;
