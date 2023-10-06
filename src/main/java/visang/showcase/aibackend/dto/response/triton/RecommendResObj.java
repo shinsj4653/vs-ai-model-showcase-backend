@@ -1,4 +1,4 @@
-package visang.showcase.aibackend.controller;
+package visang.showcase.aibackend.dto.response.triton;
 
 import lombok.AccessLevel;
 import lombok.Data;

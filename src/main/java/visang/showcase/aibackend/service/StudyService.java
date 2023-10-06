@@ -4,7 +4,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
-import visang.showcase.aibackend.controller.RecommendProbResponse;
 import visang.showcase.aibackend.dto.request.study.StudyResultSaveRequest;
 import visang.showcase.aibackend.dto.request.triton.KnowledgeLevelRequest;
 import visang.showcase.aibackend.dto.request.triton.KnowledgeReqObject;
@@ -12,6 +11,7 @@ import visang.showcase.aibackend.dto.response.diagnosis.DiagnosisProblemDto;
 import visang.showcase.aibackend.dto.response.study.RecommendProblemDto;
 import visang.showcase.aibackend.dto.response.study.StudyReadyDto;
 import visang.showcase.aibackend.dto.response.study.StudyReadyProbDto;
+import visang.showcase.aibackend.dto.response.triton.RecommendProbResponse;
 import visang.showcase.aibackend.mapper.DiagnosisMapper;
 import visang.showcase.aibackend.mapper.StudyMapper;
 
