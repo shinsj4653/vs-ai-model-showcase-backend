@@ -8,6 +8,8 @@ spring:
     hikari:
       maximum-pool-size: 4
 
+
+
 mybatis: # type을 쉽게 쓰기 위해서 dto 패키지를 type-aliaes에 설정
   mapper-locations: /mappers/**/*.xml
   type-aliases-package: visang.showcase.aibackend.dto
@@ -21,3 +23,9 @@ server:
       cookie:
         same-site: "none"
         secure : true
+
+security:
+  jwt:
+    token:
+      secret-key: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9eyJzdWIiOiIiLCJuYW1lIjoiSm9obiBEb2UiLCJpYXQiOjE1MTYyMzkwMjJ9ih1aovtQShabQ7l0cINw4k1fagApg3qLWiB8Kt59Lno
+      expire-length: 3600000
