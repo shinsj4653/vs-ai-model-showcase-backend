@@ -41,7 +41,7 @@ public class DiagnosisController {
     }
 
     @PostMapping("/dashboard")
-    public ResponseDto<?> getDashboardResult(@RequestBody DiagnosisDashboardRequest request) {
+    public ResponseDto<?> getDashboardResult(@RequestBody DiagnosisDashboardRequest request,  HttpServletRequest httpServletRequest) {
 
         // 토큰에 저장된 memberNo 값 추출
         String token = request.getTransaction_token();
@@ -49,7 +49,7 @@ public class DiagnosisController {
 
         // memberNo 값이 세션에 존재할 경우에만 서비스단 로직 수행
         if (memberNo != null) {
-            return ResponseUtil.SUCCESS("진단평가의 대시보드 결과 조회 성공", diagnosisService.getDashBoardResult(memberNo, request));
+            return ResponseUtil.SUCCESS("진단평가의 대시보드 결과 조회 성공", diagnosisService.getDashBoardResult(memberNo, request, httpServletRequest));
         } else {
             return ResponseUtil.ERROR("세션에 memberNo가 없습니다.", null);
         }
