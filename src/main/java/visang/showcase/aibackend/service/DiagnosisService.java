@@ -4,7 +4,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
-import visang.showcase.aibackend.dto.request.diagnosis.DashboardRequest;
+import visang.showcase.aibackend.dto.request.diagnosis.DiagnosisDashboardRequest;
 import visang.showcase.aibackend.dto.request.triton.KnowledgeLevelRequest;
 import visang.showcase.aibackend.dto.request.triton.KnowledgeReqObject;
 import visang.showcase.aibackend.dto.response.diagnosis.DiagnosisProblemDto;
@@ -91,7 +91,7 @@ public class DiagnosisService {
     /**
      * 트리톤 서버에 전송할 RequestBody 생성
      */
-    private KnowledgeLevelRequest createTritonRequest(String memberNo, DashboardRequest request, HttpServletRequest httpServletRequest) {
+    private KnowledgeLevelRequest createTritonRequest(String memberNo, DiagnosisDashboardRequest request, HttpServletRequest httpServletRequest) {
 
         List<DiagnosisProblemDto> preList = diagnosisMapper.getProblems(memberNo).subList(0, 85);
 
@@ -147,7 +147,7 @@ public class DiagnosisService {
      * @param request  진단평가 결과 데이터
      * @return DashboardDto 반환
      */
-    public DashboardDto getDashBoardResult(String memberNo, DashboardRequest request, HttpServletRequest httpServletRequest) {
+    public DashboardDto getDashBoardResult(String memberNo, DiagnosisDashboardRequest request, HttpServletRequest httpServletRequest) {
 
         // 트리톤 서버에 전송할 RequestBody 생성
         KnowledgeLevelRequest tritonRequest = createTritonRequest(memberNo, request, httpServletRequest);
@@ -158,7 +158,6 @@ public class DiagnosisService {
         List<Double> knowledgeRates = response.getOutputs()
                 .get(0)
                 .getData();
-
 
         // 멤버의 타깃 토픽에 대한 지식 수준 -> 세션에 저장하기
         Integer tgtTopic = diagnosisMapper.getTgtTopic(memberNo);
@@ -174,7 +173,7 @@ public class DiagnosisService {
     /**
      * 결과 대시보드 응답 데이터 생성
      */
-    private DashboardDto createDashBoardResponse(DashboardRequest request, List<Double> knowledgeRates) {
+    private DashboardDto createDashBoardResponse(DiagnosisDashboardRequest request, List<Double> knowledgeRates) {
         DashboardDto result = new DashboardDto();
         // 전체 정답률 계산
         WholeCorrectRate wholeCorrectRate = calculateWholeCorrectRate(request);
@@ -206,7 +205,7 @@ public class DiagnosisService {
      * @param resultRequest 진단평가 결과 데이터
      * @return WholeCorrectRate 반환
      */
-    private WholeCorrectRate calculateWholeCorrectRate(DashboardRequest resultRequest) {
+    private WholeCorrectRate calculateWholeCorrectRate(DiagnosisDashboardRequest resultRequest) {
         Map<String, Integer> correctRecords = new HashMap<>();
 
         for (DiagnosisProblemDto prob : resultRequest.getProb_list()) {
@@ -231,7 +230,7 @@ public class DiagnosisService {
      * @param resultRequest 진단평가 결과 데이터
      * @return List<DiffLevelCorrectRate> 반환
      */
-    private List<DiffLevelCorrectRate> calculateDiffLevelCorrectRates(DashboardRequest resultRequest) {
+    private List<DiffLevelCorrectRate> calculateDiffLevelCorrectRates(DiagnosisDashboardRequest resultRequest) {
         Map<Integer, CorrectCounter> diffLevelRecords = new HashMap<>();
 
         for (DiagnosisProblemDto prob : resultRequest.getProb_list()) {
@@ -263,7 +262,7 @@ public class DiagnosisService {
      * @param resultRequest 진단평가 결과 데이터
      * @return List<TopicCorrectRate> 반환
      */
-    private List<TopicCorrectRate> calculateTopicCorrectRates(DashboardRequest resultRequest) {
+    private List<TopicCorrectRate> calculateTopicCorrectRates(DiagnosisDashboardRequest resultRequest) {
         Map<Integer, CorrectCounter> topicRecords = new HashMap<>();
 
         for (DiagnosisProblemDto prob : resultRequest.getProb_list()) {
@@ -321,7 +320,7 @@ public class DiagnosisService {
      *
      * @return
      */
-    private StrongWeakKnowledgeResponse calculateKnowledgeStrength(DashboardRequest request, List<Double> knowledgeRates) {
+    private StrongWeakKnowledgeResponse calculateKnowledgeStrength(DiagnosisDashboardRequest request, List<Double> knowledgeRates) {
         // 진단평가에 사용된 토픽들 추출
         Set<Integer> targetTopics = request.getProb_list()
                 .stream()
@@ -361,7 +360,7 @@ public class DiagnosisService {
      * @param knowledgeRates 트리톤 서버에서 받은 지식수준 추론 결과
      * @return List<ExpectedTopicResponse> 반환
      */
-    private List<ExpectedTopicResponse> calculateExpectedKnowledgeLevel(DashboardRequest request, List<Double> knowledgeRates) {
+    private List<ExpectedTopicResponse> calculateExpectedKnowledgeLevel(DiagnosisDashboardRequest request, List<Double> knowledgeRates) {
         // 진단평가 마지막 문제 토픽 추출
         int lastIdx = request.getProb_list().size() - 1;
         int lastQIdx = request.getProb_list().get(lastIdx).getQ_idx();

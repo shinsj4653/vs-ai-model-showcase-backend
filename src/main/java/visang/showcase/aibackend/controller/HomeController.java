@@ -16,7 +16,7 @@ public class HomeController {
 
     private final HomeService homeService;
 
-    @GetMapping("test")
+    @GetMapping("/test")
     public ResponseDto<String> getQuestionExample() {
         return ResponseUtil.SUCCESS("테스트", homeService.getTopicName());
     }

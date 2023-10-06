@@ -11,6 +11,7 @@ import visang.showcase.aibackend.dto.request.triton.KnowledgeReqObject;
 import visang.showcase.aibackend.dto.response.diagnosis.DiagnosisProblemDto;
 import visang.showcase.aibackend.dto.response.study.RecommendProblemDto;
 import visang.showcase.aibackend.dto.response.study.StudyReadyDto;
+import visang.showcase.aibackend.dto.response.study.StudyReadyProbDto;
 import visang.showcase.aibackend.mapper.DiagnosisMapper;
 import visang.showcase.aibackend.mapper.StudyMapper;
 
@@ -57,10 +58,10 @@ public class StudyService {
         return studyMapper.getRecommendProblemWithQIdx(studyReadyTopicIdx);
     }
 
-    public List<RecommendProblemDto> setStudyReadyProblems(StudyResultSaveRequest request, HttpServletRequest httpServletRequest) {
+    public List<StudyReadyProbDto> setStudyReadyProblems(StudyResultSaveRequest request, HttpServletRequest httpServletRequest) {
 
         // 학습준비 문제 풀이 시퀀스
-        List<RecommendProblemDto> probList = request.getProb_list();
+        List<StudyReadyProbDto> probList = request.getProb_list();
 
         // 학습준비 문제 풀이 시퀀스 -> 세션에 저장
         HttpSession session = httpServletRequest.getSession();
