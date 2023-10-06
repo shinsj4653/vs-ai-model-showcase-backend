@@ -33,7 +33,7 @@ public class DiagnosisController {
         // return ResponseUtil.SUCCESS("타켓 학생의 문제 풀이 시퀀스, 응답 시퀀스 조회 성공 ", diagnosisService.jsonTest(token));
         // memberNo 값이 세션에 존재할 경우에만 서비스단 로직 수행
         if (memberNo != null) {
-            return ResponseUtil.SUCCESS("진단평가 필요 문항 조회 성공", diagnosisService.getProblems(token));
+            return ResponseUtil.SUCCESS("진단평가 필요 문항 조회 성공", diagnosisService.getProblems(memberNo));
 
         } else {
             return ResponseUtil.ERROR("세션에 memberNo가 없습니다.", null);
