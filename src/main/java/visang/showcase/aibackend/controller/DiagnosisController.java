@@ -2,7 +2,7 @@ package visang.showcase.aibackend.controller;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
-import visang.showcase.aibackend.dto.request.diagnosis.DashboardRequest;
+import visang.showcase.aibackend.dto.request.diagnosis.DiagnosisDashboardRequest;
 import visang.showcase.aibackend.dto.response.common.ResponseDto;
 import visang.showcase.aibackend.dto.response.common.ResponseUtil;
 import visang.showcase.aibackend.dto.response.diagnosis.DiagnosisProblemDto;
@@ -19,7 +19,7 @@ public class DiagnosisController {
 
     private final DiagnosisService diagnosisService;
 
-    @GetMapping("getProblems")
+    @GetMapping("/getProblems")
     public ResponseDto<List<DiagnosisProblemDto>> getProblems(HttpSession session) {
         String memberNo = (String) session.getAttribute("memberNo");
         // memberNo 값이 세션에 존재할 경우에만 서비스단 로직 수행
@@ -31,8 +31,8 @@ public class DiagnosisController {
         }
     }
 
-    @PostMapping("dashboard")
-    public ResponseDto<?> getDashboardResult(HttpSession session, @RequestBody DashboardRequest request, HttpServletRequest httpServletRequest) {
+    @PostMapping("/dashboard")
+    public ResponseDto<?> getDashboardResult(HttpSession session, @RequestBody DiagnosisDashboardRequest request, HttpServletRequest httpServletRequest) {
         String memberNo = (String) session.getAttribute("memberNo");
         // memberNo 값이 세션에 존재할 경우에만 서비스단 로직 수행
         if (memberNo != null) {

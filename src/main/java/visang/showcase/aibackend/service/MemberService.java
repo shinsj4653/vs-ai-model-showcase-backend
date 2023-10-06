@@ -30,7 +30,7 @@ public class MemberService {
         // 프론트엔드에서 전달한 member_no 값을 가져옴
         String memberNo = memberNoRequest.getMemberNo();
 
-        // 세션을 얻어와서 member_no 값을 세션에 저장
+        // 세션을 얻어와서 member_no, tgt_topic 값을 세션에 저장
         HttpSession session = request.getSession();
         session.setAttribute("memberNo", memberNo);
 

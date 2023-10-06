@@ -2,14 +2,13 @@ package visang.showcase.aibackend.controller;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
-import visang.showcase.aibackend.dto.request.diagnosis.DashboardRequest;
 import visang.showcase.aibackend.dto.request.study.StudyResultSaveRequest;
 import visang.showcase.aibackend.dto.response.common.ResponseDto;
 import visang.showcase.aibackend.dto.response.common.ResponseUtil;
 import visang.showcase.aibackend.dto.response.diagnosis.DiagnosisProblemDto;
 import visang.showcase.aibackend.dto.response.study.RecommendProblemDto;
 import visang.showcase.aibackend.dto.response.study.StudyReadyDto;
-import visang.showcase.aibackend.mapper.StudyMapper;
+import visang.showcase.aibackend.dto.response.study.StudyReadyProbDto;
 import visang.showcase.aibackend.service.StudyService;
 
 import javax.servlet.http.HttpServletRequest;
@@ -23,13 +22,6 @@ public class StudyController {
 
     private final StudyService studyService;
 
-    @GetMapping("/recommend")
-    public ResponseDto<List<RecommendProblemDto>> recommendProb(HttpSession session) {
-        String memberNo = (String) session.getAttribute("memberNo");
-        List<DiagnosisProblemDto> probList = (List<DiagnosisProblemDto>) session.getAttribute("diagnosisResult");
-        return ResponseUtil.SUCCESS("학습준비에 필요한 문항 조회 성공", studyService.getStudyReadyProblems(memberNo, probList));
-    }
-
     @GetMapping("/isReady")
     public ResponseDto<StudyReadyDto> isStudyReady(HttpSession session) {
         Double tgtTopicKnowledgeRate = (Double) session.getAttribute("tgtTopicKnowledgeRate");
@@ -37,8 +29,15 @@ public class StudyController {
         return ResponseUtil.SUCCESS("학습 준비 완료 여부 반환 성공", studyService.isStudyReady(tgtTopicKnowledgeRate));
     }
 
+    @GetMapping("/recommend")
+    public ResponseDto<List<RecommendProblemDto>> recommendProb(HttpSession session) {
+        String memberNo = (String) session.getAttribute("memberNo");
+        List<DiagnosisProblemDto> probList = (List<DiagnosisProblemDto>) session.getAttribute("diagnosisResult");
+        return ResponseUtil.SUCCESS("학습준비에 필요한 문항 조회 성공", studyService.getStudyReadyProblems(memberNo, probList));
+    }
+
     @PostMapping("/setResult")
-    public ResponseDto<List<RecommendProblemDto>> setStudyReadyProblems(@RequestBody StudyResultSaveRequest request, HttpServletRequest httpServletRequest) {
+    public ResponseDto<List<StudyReadyProbDto>> setStudyReadyProblems(@RequestBody StudyResultSaveRequest request, HttpServletRequest httpServletRequest) {
         return ResponseUtil.SUCCESS("학습준비 문제 풀이 시퀀스 세션에 저장 성공", studyService.setStudyReadyProblems(request, httpServletRequest));
     }
 

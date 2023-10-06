@@ -4,13 +4,14 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
-import visang.showcase.aibackend.controller.RecommendProbResponse;
 import visang.showcase.aibackend.dto.request.study.StudyResultSaveRequest;
 import visang.showcase.aibackend.dto.request.triton.KnowledgeLevelRequest;
 import visang.showcase.aibackend.dto.request.triton.KnowledgeReqObject;
 import visang.showcase.aibackend.dto.response.diagnosis.DiagnosisProblemDto;
 import visang.showcase.aibackend.dto.response.study.RecommendProblemDto;
 import visang.showcase.aibackend.dto.response.study.StudyReadyDto;
+import visang.showcase.aibackend.dto.response.study.StudyReadyProbDto;
+import visang.showcase.aibackend.dto.response.triton.RecommendProbResponse;
 import visang.showcase.aibackend.mapper.DiagnosisMapper;
 import visang.showcase.aibackend.mapper.StudyMapper;
 
@@ -33,7 +34,7 @@ public class StudyService {
     private final StudyMapper studyMapper;
 
     // 학습준비 이행 가능 여부 판단 기준이 되는 지식 수준
-    public static final double THRESHOLD = 0.6;
+    public static final double THRESHOLD = 3.0;
 
     public StudyReadyDto isStudyReady(Double tgtTopicKnowledgeRate) {
         // 타켓토픽의 지식 수준이 기준을 넘으면 학습준비를 할 필요가 없다
@@ -57,10 +58,10 @@ public class StudyService {
         return studyMapper.getRecommendProblemWithQIdx(studyReadyTopicIdx);
     }
 
-    public List<RecommendProblemDto> setStudyReadyProblems(StudyResultSaveRequest request, HttpServletRequest httpServletRequest) {
+    public List<StudyReadyProbDto> setStudyReadyProblems(StudyResultSaveRequest request, HttpServletRequest httpServletRequest) {
 
         // 학습준비 문제 풀이 시퀀스
-        List<RecommendProblemDto> probList = request.getProb_list();
+        List<StudyReadyProbDto> probList = request.getProb_list();
 
         // 학습준비 문제 풀이 시퀀스 -> 세션에 저장
         HttpSession session = httpServletRequest.getSession();

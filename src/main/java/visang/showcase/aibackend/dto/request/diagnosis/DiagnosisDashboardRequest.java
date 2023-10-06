@@ -6,6 +6,6 @@ import visang.showcase.aibackend.dto.response.diagnosis.DiagnosisProblemDto;
 import java.util.List;
 
 @Getter
-public class DashboardRequest {
+public class DiagnosisDashboardRequest {
     private List<DiagnosisProblemDto> prob_list;
 }
