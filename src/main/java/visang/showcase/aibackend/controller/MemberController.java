@@ -6,6 +6,7 @@ import visang.showcase.aibackend.dto.request.member.MemberNoRequest;
 import visang.showcase.aibackend.dto.response.common.ResponseDto;
 import visang.showcase.aibackend.dto.response.common.ResponseUtil;
 import visang.showcase.aibackend.dto.response.member.MemberDto;
+import visang.showcase.aibackend.dto.response.token.TokenResponse;
 import visang.showcase.aibackend.service.MemberService;
 
 import javax.servlet.http.HttpServletRequest;
@@ -23,7 +24,7 @@ public class MemberController {
     }
 
     @PostMapping("/setMemberNo")
-    public ResponseDto<String> setMemberNo(@RequestBody MemberNoRequest memberNoRequest, HttpServletRequest request) {
-        return ResponseUtil.SUCCESS("학생번호 선택 완료.", memberService.setMemberNo(memberNoRequest, request));
+    public ResponseDto<TokenResponse> setMemberNo(@RequestBody MemberNoRequest memberNoRequest) {
+        return ResponseUtil.SUCCESS("학생번호 선택 완료.", memberService.setMemberNo(memberNoRequest));
     }
 }
