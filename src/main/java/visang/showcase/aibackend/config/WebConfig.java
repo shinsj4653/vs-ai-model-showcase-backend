@@ -11,8 +11,8 @@ public class WebConfig implements WebMvcConfigurer {
     @Override
     public void addCorsMappings(CorsRegistry registry) {
         registry.addMapping("/**")
-                .allowedOriginPatterns("*") //로컬, 개발
-//                .allowedOrigins("http://13.209.224.148", "http://localhost:8004"
+//                .allowedOriginPatterns("*") //로컬, 개발
+                .allowedOrigins("http://13.209.224.148", "http://localhost:8004", "https://localhost:8004")
 //                        , "http://localhost", "https://106.241.14.16:8004"
 //                        , "http://121.157.55.33:8004", "https://58.150.173.10:8004", "https://1.224.28.88:8004") //로컬, 개발
                 .allowedHeaders("*")
