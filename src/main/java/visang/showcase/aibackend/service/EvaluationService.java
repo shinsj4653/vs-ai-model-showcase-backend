@@ -230,13 +230,9 @@ public class EvaluationService {
                     .map((prob) -> prob_nos.indexOf(prob.getProb_no()) + 1)
                     .collect(Collectors.toList());
             // 틀린문제가 존재하는 경우
-            if (prob_idxs.size() > 0){
-                result.setMistake_prob(new CheckProbDto(prob_idxs, topicName, after));
-            } else { // 틀린문제가 없는 경우
-                result.setMistake_prob(null);
-            }
+            result.setMistake_prob(new CheckProbDto(prob_idxs, topicName, after));
             // 점검해야 하는 문항정보는 null로 반환
-            result.setCheck_prob(null);
+            result.setCheck_prob(new CheckProbDto(new ArrayList<>(), topicName, after));
         } else { // 점검이 필요한 문항
             // 맞은문제 문항번호 추출
             List<Integer> prob_idxs = request.getProb_list()
@@ -245,13 +241,9 @@ public class EvaluationService {
                     .map((prob) -> prob_nos.indexOf(prob.getProb_no()) + 1)
                     .collect(Collectors.toList());
             // 맞은문제가 존재하는 경우
-            if (prob_idxs.size() > 0){
-                result.setCheck_prob(new CheckProbDto(prob_idxs, topicName, after));
-            } else { // 맞은문제가 없는 경우
-                result.setCheck_prob(null);
-            }
+            result.setCheck_prob(new CheckProbDto(prob_idxs, topicName, after));
             // 실수로 틀린 문항정보는 null로 반환
-            result.setMistake_prob(null);
+            result.setMistake_prob(new CheckProbDto(new ArrayList<>(), topicName, after));
         }
 
         return result;
