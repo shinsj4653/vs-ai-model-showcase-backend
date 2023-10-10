@@ -13,5 +13,6 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class StudyResultSaveRequest {
+    private String transaction_token;
     private List<StudyReadyProbDto> prob_list;
 }

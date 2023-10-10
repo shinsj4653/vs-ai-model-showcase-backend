@@ -9,5 +9,5 @@ public class KnowledgeReqObject {
     private String name;
     private String datatype;
     private List<Integer> shape;
-    private List<List<Integer>> data;
+    private List<List<Long>> data;
 }

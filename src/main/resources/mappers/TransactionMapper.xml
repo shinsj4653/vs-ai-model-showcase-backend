@@ -11,9 +11,34 @@
         where transaction_token = #{transaction_token};
     </select>
 
-    <insert id="insertDiagnosisData">
-        insert into ai_model_showcase.transaction_data(transaction_token, diagnosis_data)
-            values (#{transaction_token}, #{diagnosis_data})
-    </insert>
+    <select id="getStudyData" resultType="String" fetchSize="1000">
+        select study_data
+        from ai_model_showcase.transaction_data
+        where transaction_token = #{transaction_token};
+    </select>
+
+    <select id="getTgtTopicKnowledgeRate" resultType="double" fetchSize="1000">
+        select tgt_topic_knowledge_rate
+        from ai_model_showcase.transaction_data
+        where transaction_token = #{transaction_token};
+    </select>
+
+    <update id="updateDiagnosisData">
+        update ai_model_showcase.transaction_data
+        set diagnosis_data = #{diagnosis_data}
+        where transaction_token = #{transaction_token}
+    </update>
+
+    <update id="updateStudyData">
+        update ai_model_showcase.transaction_data
+        set study_data = #{study_data}
+        where transaction_token = #{transaction_token}
+    </update>
+
+    <update id="updateTgtTopicKnowledgeRate">
+        update ai_model_showcase.transaction_data
+        set tgt_topic_knowledge_rate = #{tgtTopicKnowledgeRate}
+        where transaction_token = #{transaction_token}
+    </update>
 
 </mapper>

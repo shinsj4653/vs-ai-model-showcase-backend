@@ -9,5 +9,6 @@ import java.util.List;
 @Getter
 @NoArgsConstructor
 public class EvaluationDashboardRequest {
+    private String transaction_token;
     private List<EvaluationProbRequest> prob_list;
 }
