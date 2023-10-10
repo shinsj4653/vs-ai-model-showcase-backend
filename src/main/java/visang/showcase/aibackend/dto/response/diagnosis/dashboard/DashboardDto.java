@@ -29,4 +29,7 @@ public class DashboardDto {
     /* 앞으로 배울 토픽 예상 지식 수준 */
     private List<ExpectedTopicResponse> future_topic_level_expectation;
 
+    /* 지식 맵 html 코드 */
+    private String intelligence_map_html;
+
 }

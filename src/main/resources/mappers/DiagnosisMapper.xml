@@ -64,4 +64,12 @@
             #{qIdx}
         </foreach>
     </select>
+
+    <!-- GET intelligence_map_html -->
+    <select id="getIntelligenceMapHtml" resultType="String" fetchSize="1000">
+        select intelligence_map_html
+        from ai_model_showcase.tb_member_info
+        where member_no = #{memberNo}
+    </select>
+
 </mapper>

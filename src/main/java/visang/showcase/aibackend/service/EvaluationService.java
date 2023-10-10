@@ -166,19 +166,6 @@ public class EvaluationService {
 
         RestTemplate restTemplate = new RestTemplate();
         KnowledgeLevelResponse responseEntity = restTemplate.postForObject(TRITON_SERVER_URL + INFERENCE_URI, request, KnowledgeLevelResponse.class);
-
-        List<KnowledgeResObject> outputs = responseEntity.getOutputs();
-
-        outputs.get(0)
-                .getData()
-                .stream()
-                .map(rate -> {
-                    if (rate < 0.0)
-                        return 0.0;
-                    return rate;
-                });
-
-        responseEntity.setOutputs(outputs);
         return responseEntity;
     }
 
