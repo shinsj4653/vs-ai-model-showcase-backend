@@ -10,5 +10,5 @@ import java.util.List;
 public interface MemberMapper {
     List<MemberQueryDto> getMembers();
 
-    String saveToken(@Param("token") String transaction_token);
+    String saveToken(@Param("transaction_token") String transaction_token);
 }

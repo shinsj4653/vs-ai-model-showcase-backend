@@ -1,5 +1,7 @@
 package visang.showcase.aibackend.service;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -10,12 +12,12 @@ import visang.showcase.aibackend.dto.request.triton.KnowledgeReqObject;
 import visang.showcase.aibackend.dto.response.diagnosis.DiagnosisProblemDto;
 import visang.showcase.aibackend.dto.response.diagnosis.dashboard.*;
 import visang.showcase.aibackend.dto.response.triton.KnowledgeLevelResponse;
+import visang.showcase.aibackend.dto.response.triton.KnowledgeResObject;
 import visang.showcase.aibackend.mapper.DiagnosisMapper;
+import visang.showcase.aibackend.mapper.TransactionMapper;
 import visang.showcase.aibackend.vo.CorrectCounter;
 import visang.showcase.aibackend.vo.TopicKnowledge;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpSession;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -46,6 +48,8 @@ public class DiagnosisService {
     private Map<Integer, String> topicNames = new HashMap<>();
 
     private final DiagnosisMapper diagnosisMapper;
+    private final TransactionMapper transactionMapper;
+    private final ObjectMapper objectMapper;
 
     /**
      * 끝부분 15개의 문항만 클라이언트로 반환
@@ -91,7 +95,7 @@ public class DiagnosisService {
     /**
      * 트리톤 서버에 전송할 RequestBody 생성
      */
-    private KnowledgeLevelRequest createTritonRequest(String memberNo, DiagnosisDashboardRequest request, HttpServletRequest httpServletRequest) {
+    private KnowledgeLevelRequest createTritonRequest(String memberNo, DiagnosisDashboardRequest request, String token) {
 
         List<DiagnosisProblemDto> preList = diagnosisMapper.getProblems(memberNo).subList(0, 85);
 
@@ -104,9 +108,13 @@ public class DiagnosisService {
         // category, topic 매핑데이터 생성
         createProbMetaData(mergedList);
 
-        // 문제 100개에 해당하는 리스트 -> 세션에 저장
-        HttpSession session = httpServletRequest.getSession();
-        session.setAttribute("diagnosisResult", mergedList);
+        // 문제 100개에 해당하는 리스트 -> DB에 저장
+        try {
+            String diagnosis_data = objectMapper.writeValueAsString(mergedList);
+            transactionMapper.updateDiagnosisData(token, diagnosis_data);
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException(e);
+        }
 
         List<Integer> q_idx_list = mergedList.stream()
                 .map(m -> m.getQ_idx()).collect(Collectors.toList());  // 토픽 리스트
@@ -137,6 +145,18 @@ public class DiagnosisService {
         RestTemplate restTemplate = new RestTemplate();
         KnowledgeLevelResponse responseEntity = restTemplate.postForObject(TRITON_SERVER_URL + INFERENCE_URI, request, KnowledgeLevelResponse.class);
 
+        List<KnowledgeResObject> outputs = responseEntity.getOutputs();
+
+        outputs.get(0)
+                .getData()
+                .stream()
+                .map(rate -> {
+                    if (rate < 0.0)
+                        return 0.0;
+                    return rate;
+                });
+
+        responseEntity.setOutputs(outputs);
         return responseEntity;
     }
 
@@ -147,10 +167,10 @@ public class DiagnosisService {
      * @param request  진단평가 결과 데이터
      * @return DashboardDto 반환
      */
-    public DashboardDto getDashBoardResult(String memberNo, DiagnosisDashboardRequest request, HttpServletRequest httpServletRequest) {
+    public DashboardDto getDashBoardResult(String memberNo, DiagnosisDashboardRequest request, String token) {
 
         // 트리톤 서버에 전송할 RequestBody 생성
-        KnowledgeLevelRequest tritonRequest = createTritonRequest(memberNo, request, httpServletRequest);
+        KnowledgeLevelRequest tritonRequest = createTritonRequest(memberNo, request, token);
         // RestTemplate을 사용하여 트리톤 지식상태 추론 서버의 응답 값 반환
         KnowledgeLevelResponse response = postWithKnowledgeLevelTriton(tritonRequest);
 
@@ -159,13 +179,10 @@ public class DiagnosisService {
                 .get(0)
                 .getData();
 
-        // 멤버의 타깃 토픽에 대한 지식 수준 -> 세션에 저장하기
+        // 멤버의 타깃 토픽에 대한 지식 수준 -> DB에 저장하기
         Integer tgtTopic = diagnosisMapper.getTgtTopic(memberNo);
         Double tgtTopicKnowledgeRate = knowledgeRates.get(tgtTopic);
-
-        // 세션을 얻어와서 tgtTopicKnowledgeRate 값을 세션에 저장
-        HttpSession session = httpServletRequest.getSession();
-        session.setAttribute("tgtTopicKnowledgeRate", tgtTopicKnowledgeRate);
+        transactionMapper.updateTgtTopicKnowledgeRate(token, tgtTopicKnowledgeRate);
 
         return createDashBoardResponse(request, knowledgeRates);
     }

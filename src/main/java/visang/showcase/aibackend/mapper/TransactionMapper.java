@@ -8,12 +8,16 @@ import java.util.Map;
 @Mapper
 public interface TransactionMapper {
 
-    // 진단평가 데이터
-//    void insertDiagnosisData(@Param("transaction_token") String transaction_token, @Param("diagnosis_data") String diagnosis_data);
-    void updateDiagnosisData(@Param("transaction_token") String transaction_token);
+    // 타겟토픽 지식수준
+    void updateTgtTopicKnowledgeRate(@Param("transaction_token") String transaction_token, @Param("tgtTopicKnowledgeRate") Double tgtTopicKnowledgeRate);
+    Double getTgtTopicKnowledgeRate(@Param("transaction_token") String transaction_token);
 
+    // 진단평가 데이터
+    String getDiagnosisData(@Param("transaction_token") String transaction_token);
+    void updateDiagnosisData(@Param("transaction_token") String transaction_token, @Param("diagnosis_data") String diagnosis_data);
 
     // 학습준비 데이터
+    String getStudyData(@Param("transaction_token") String transaction_token);
     void updateStudyData(@Param("transaction_token") String transaction_token, @Param("study_data") String study_data);
 
 }

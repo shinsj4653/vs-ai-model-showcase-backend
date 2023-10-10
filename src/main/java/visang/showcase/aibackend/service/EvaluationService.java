@@ -1,5 +1,8 @@
 package visang.showcase.aibackend.service;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonMappingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
@@ -14,11 +17,11 @@ import visang.showcase.aibackend.dto.response.evaluation.dashboard.EvaluationDas
 import visang.showcase.aibackend.dto.response.evaluation.dashboard.TopicLevelChangeDto;
 import visang.showcase.aibackend.dto.response.study.StudyReadyProbDto;
 import visang.showcase.aibackend.dto.response.triton.KnowledgeLevelResponse;
+import visang.showcase.aibackend.dto.response.triton.KnowledgeResObject;
 import visang.showcase.aibackend.mapper.DiagnosisMapper;
 import visang.showcase.aibackend.mapper.EvaluationMapper;
+import visang.showcase.aibackend.mapper.TransactionMapper;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpSession;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -37,6 +40,8 @@ public class EvaluationService {
 
     private final EvaluationMapper evaluationMapper;
     private final DiagnosisMapper diagnosisMapper;
+    private final TransactionMapper transactionMapper;
+    private final ObjectMapper objectMapper;
 
     /**
      * 형성평가 문항 5개 조회
@@ -44,7 +49,6 @@ public class EvaluationService {
      */
     public List<EvaluationProblemDto> getProblems(String memberNo) {
         Integer qIdx = diagnosisMapper.getTgtTopic(memberNo);
-        System.out.println(qIdx);
         return evaluationMapper.getProblems(qIdx);
     }
 
@@ -68,11 +72,23 @@ public class EvaluationService {
     /**
      * 트리톤 서버에 전송할 RequestBody 생성
      */
-    private KnowledgeLevelRequest createTritonRequest(EvaluationDashboardRequest request, HttpServletRequest httpServletRequest) {
+    private KnowledgeLevelRequest createTritonRequest(EvaluationDashboardRequest request, String token) {
         // 진단평가 문제 100개 + 학습준비 문제 5개 + 진단평가 문제 5개 누적
-        HttpSession session = httpServletRequest.getSession();
-        var diagnosisResult = (List<DiagnosisProblemDto>) session.getAttribute("diagnosisResult");
-        var studyReadyResult = (List<StudyReadyProbDto>) session.getAttribute("studyReadyResult");
+
+        String diagnosisData = transactionMapper.getDiagnosisData(token);
+        String studyData = transactionMapper.getStudyData(token);
+
+        List<DiagnosisProblemDto> diagnosisResult;
+        List<StudyReadyProbDto> studyReadyResult;
+        try{
+            diagnosisResult = List.of(objectMapper.readValue(diagnosisData, DiagnosisProblemDto[].class));
+            studyReadyResult = List.of(objectMapper.readValue(studyData, StudyReadyProbDto[].class));
+        } catch (JsonMappingException e) {
+            throw new RuntimeException(e);
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException(e);
+        }
+
         List<EvaluationProbRequest> evaluationResult =  request.getProb_list();
 
         // 토픽리스트 추출
@@ -150,6 +166,18 @@ public class EvaluationService {
         RestTemplate restTemplate = new RestTemplate();
         KnowledgeLevelResponse responseEntity = restTemplate.postForObject(TRITON_SERVER_URL + INFERENCE_URI, request, KnowledgeLevelResponse.class);
 
+        List<KnowledgeResObject> outputs = responseEntity.getOutputs();
+
+        outputs.get(0)
+                .getData()
+                .stream()
+                .map(rate -> {
+                    if (rate < 0.0)
+                        return 0.0;
+                    return rate;
+                });
+
+        responseEntity.setOutputs(outputs);
         return responseEntity;
     }
 
@@ -158,14 +186,13 @@ public class EvaluationService {
      *
      * @param memberNo 학생번호
      * @param request RequestBody 데이터
-     * @param httpServletRequest Session 정보를 가져오기 위한 HttpServletRequest
      * @return EvaluationDashboardResult 반환
      */
-    public EvaluationDashboardResult getDashboardResult(String memberNo, EvaluationDashboardRequest request, HttpServletRequest httpServletRequest){
+    public EvaluationDashboardResult getDashboardResult(String memberNo, EvaluationDashboardRequest request, String token){
         EvaluationDashboardResult result = new EvaluationDashboardResult();
 
         // 형성평가 문항들을 누적하여 지식수준 재추론
-        KnowledgeLevelRequest tritonRequest = createTritonRequest(request, httpServletRequest);
+        KnowledgeLevelRequest tritonRequest = createTritonRequest(request, token);
         KnowledgeLevelResponse response = postWithKnowledgeLevelTriton(tritonRequest);
 
         // 지식수준 추론 결과
@@ -179,8 +206,7 @@ public class EvaluationService {
                 .getTopic_nm();
 
         // 진단평가 직후의 타겟토픽 지식수준
-        Double before = (Double) httpServletRequest.getSession()
-                .getAttribute("tgtTopicKnowledgeRate");
+        Double before = transactionMapper.getTgtTopicKnowledgeRate(token);
 
         // 형성평가 이후의 타겟토픽 지식수준
         Integer tgtTopic = diagnosisMapper.getTgtTopic(memberNo);

@@ -1,6 +1,7 @@
 package visang.showcase.aibackend.service;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -39,16 +40,31 @@ public class StudyService {
     // 학습준비 이행 가능 여부 판단 기준이 되는 지식 수준
     public static final double THRESHOLD = 3.0;
 
-    public StudyReadyDto isStudyReady(Double tgtTopicKnowledgeRate) {
+    public StudyReadyDto isStudyReady(String token) {
         // 타켓토픽의 지식 수준이 기준을 넘으면 학습준비를 할 필요가 없다
+        Double tgtTopicKnowledgeRate = transactionMapper.getTgtTopicKnowledgeRate(token);
+
         if (tgtTopicKnowledgeRate >= THRESHOLD)
             return new StudyReadyDto(false);
         else // 기준을 못 넘겼을 시에는 학습 준비를 해야 한다
             return new StudyReadyDto(true);
     }
 
-    public List<RecommendProblemDto> getStudyReadyProblems(String memberNo, List<DiagnosisProblemDto> probList) {
-        KnowledgeLevelRequest recommendProbRequest = createTritonRequest(memberNo, probList);
+    public List<RecommendProblemDto> getStudyReadyProblems(String memberNo, String token) {
+
+        // transaction_data에 저장된 100개의 진단평가 문항 가져오기
+        String diagnosisData = transactionMapper.getDiagnosisData(token);
+        List<DiagnosisProblemDto> diagnosisResult;
+
+        try{
+            diagnosisResult = List.of(objectMapper.readValue(diagnosisData, DiagnosisProblemDto[].class));
+        } catch (JsonMappingException e) {
+            throw new RuntimeException(e);
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException(e);
+        }
+
+        KnowledgeLevelRequest recommendProbRequest = createTritonRequest(memberNo, diagnosisResult);
         RecommendProbResponse recommendProbResponse = postWithRecommendTriton(recommendProbRequest);
 
         // 학습준비에 필요한 토픽 배열의 맨 첫 토픽Idx 가져오기
@@ -66,12 +82,9 @@ public class StudyService {
         // 학습준비 문제 풀이 시퀀스
         List<StudyReadyProbDto> probList = request.getProb_list();
 
-        // 학습준비 문제 풀이 시퀀스 -> 세션에 저장
-//        HttpSession session = httpServletRequest.getSession();
-//        session.setAttribute("studyReadyResult", probList);
-
+        // 학습준비 데이터 DB에 저장
         try {
-            String study_data = objectMapper.writeValueAsString(request);
+            String study_data = objectMapper.writeValueAsString(probList);
             transactionMapper.updateStudyData(transaction_token, study_data);
 
             return probList;
@@ -87,6 +100,7 @@ public class StudyService {
 
         // memberNo에 해당하는 tgt_topic 값 가져오기
         Integer tgtTopic = diagnosisMapper.getTgtTopic(memberNo);
+
 
         // 세션에 저장된 진단평가 100문항에서 필요한 정보 사용
         List<Integer> q_idx_list = probList.stream()

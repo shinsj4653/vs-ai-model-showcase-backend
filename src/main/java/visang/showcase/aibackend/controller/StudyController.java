@@ -3,17 +3,15 @@ package visang.showcase.aibackend.controller;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 import visang.showcase.aibackend.dto.request.study.StudyResultSaveRequest;
+import visang.showcase.aibackend.dto.request.token.TokenRequest;
 import visang.showcase.aibackend.dto.response.common.ResponseDto;
 import visang.showcase.aibackend.dto.response.common.ResponseUtil;
-import visang.showcase.aibackend.dto.response.diagnosis.DiagnosisProblemDto;
 import visang.showcase.aibackend.dto.response.study.RecommendProblemDto;
 import visang.showcase.aibackend.dto.response.study.StudyReadyDto;
 import visang.showcase.aibackend.dto.response.study.StudyReadyProbDto;
 import visang.showcase.aibackend.service.StudyService;
 import visang.showcase.aibackend.util.JwtTokenProvider;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpSession;
 import java.util.List;
 
 @RestController
@@ -24,18 +22,17 @@ public class StudyController {
     private final StudyService studyService;
     private final JwtTokenProvider jwtTokenProvider;
 
-    @GetMapping("/isReady")
-    public ResponseDto<StudyReadyDto> isStudyReady(HttpSession session) {
-        Double tgtTopicKnowledgeRate = (Double) session.getAttribute("tgtTopicKnowledgeRate");
-        System.out.println(tgtTopicKnowledgeRate);
-        return ResponseUtil.SUCCESS("학습 준비 완료 여부 반환 성공", studyService.isStudyReady(tgtTopicKnowledgeRate));
+    @PostMapping("/isReady")
+    public ResponseDto<StudyReadyDto> isStudyReady(@RequestBody TokenRequest request) {
+        String token = request.getTransaction_token();
+        return ResponseUtil.SUCCESS("학습 준비 완료 여부 반환 성공", studyService.isStudyReady(token));
     }
 
-    @GetMapping("/recommend")
-    public ResponseDto<List<RecommendProblemDto>> recommendProb(HttpSession session) {
-        String memberNo = (String) session.getAttribute("memberNo");
-        List<DiagnosisProblemDto> probList = (List<DiagnosisProblemDto>) session.getAttribute("diagnosisResult");
-        return ResponseUtil.SUCCESS("학습준비에 필요한 문항 조회 성공", studyService.getStudyReadyProblems(memberNo, probList));
+    @PostMapping("/recommend")
+    public ResponseDto<List<RecommendProblemDto>> recommendProb(@RequestBody TokenRequest request) {
+        String token = request.getTransaction_token();
+        String memberNo = jwtTokenProvider.getMemberNo(token);
+        return ResponseUtil.SUCCESS("학습준비에 필요한 문항 조회 성공", studyService.getStudyReadyProblems(memberNo, token));
     }
 
     @PostMapping("/setResult")

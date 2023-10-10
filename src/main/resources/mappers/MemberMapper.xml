@@ -14,6 +14,6 @@
     <!-- getMemberToken -->
     <select id="saveToken" resultType="String" fetchSize="1000">
         insert into ai_model_showcase.transaction_data(transaction_token)
-        values(#{token});
+        values(#{transaction_token});
     </select>
 </mapper>
