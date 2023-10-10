@@ -11,6 +11,12 @@
         join ai_model_showcase.tb_topic_info ttci on tmi.tgt_topic = ttci.q_idx;
     </select>
 
+    <select id="getMemberInfo" resultType="Integer" fetchSize="1000">
+        select count(*)
+        from ai_model_showcase.tb_member_info tmi
+        where member_no = #{memberNo}
+    </select>
+
     <!-- getMemberToken -->
     <select id="saveToken" resultType="String" fetchSize="1000">
         insert into ai_model_showcase.transaction_data(transaction_token)

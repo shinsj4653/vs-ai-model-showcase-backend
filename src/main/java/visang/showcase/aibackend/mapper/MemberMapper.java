@@ -11,4 +11,6 @@ public interface MemberMapper {
     List<MemberQueryDto> getMembers();
 
     String saveToken(@Param("transaction_token") String transaction_token);
+
+    Integer getMemberInfo(@Param("memberNo") String memberNo);
 }

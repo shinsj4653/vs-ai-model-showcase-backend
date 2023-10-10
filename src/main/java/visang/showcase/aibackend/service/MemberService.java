@@ -33,6 +33,12 @@ public class MemberService {
         // 프론트엔드에서 전달한 member_no 값을 가져옴
         String memberNo = memberNoRequest.getMemberNo();
 
+        // 만약 존재하지 않는 회원이면 토큰 발급 X
+        Integer memberCnt = memberMapper.getMemberInfo(memberNo);
+        if (memberCnt == 0) {
+            return null;
+        }
+
         Map<String, Object> claims = new HashMap<>();
         claims.put("memberNo", memberNo);
         String token = tokenProvider.createToken(claims);
