@@ -1,10 +1,13 @@
 package visang.showcase.aibackend.dto.response.study;
 
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Getter
-@NoArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@AllArgsConstructor
 public class StudyReadyProbDto {
     private Integer q_idx; // 토픽 인덱스
     private Integer diff_level; // 난이도

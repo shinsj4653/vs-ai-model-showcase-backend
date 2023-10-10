@@ -78,7 +78,7 @@ public class DiagnosisService {
     /**
      * RequestBody의 INPUT__ 요청 객체 생성
      */
-    private KnowledgeReqObject createRequestObj(int idx, List<Integer> payload) {
+    private KnowledgeReqObject createRequestObj(int idx, List<Long> payload) {
         KnowledgeReqObject obj = new KnowledgeReqObject();
         obj.setName("INPUT__" + idx);
         obj.setDatatype("INT64");
@@ -86,7 +86,7 @@ public class DiagnosisService {
         List<Integer> shape = List.of(1, 100); // 배치 사이즈, 문항 수
         obj.setShape(shape);
 
-        List<List<Integer>> data = List.of(payload);
+        List<List<Long>> data = List.of(payload);
         obj.setData(data);
 
         return obj;
@@ -116,15 +116,14 @@ public class DiagnosisService {
             throw new RuntimeException(e);
         }
 
-        List<Integer> q_idx_list = mergedList.stream()
-                .map(m -> m.getQ_idx()).collect(Collectors.toList());  // 토픽 리스트
+        List<Long> q_idx_list = mergedList.stream()
+                .map(m -> Long.valueOf(m.getQ_idx())).collect(Collectors.toList());  // 토픽 리스트
 
-        List<Integer> correct_list = mergedList.stream()
-                .map(m -> m.getCorrect()).collect(Collectors.toList()); // 정오답 리스트
+        List<Long> correct_list = mergedList.stream()
+                .map(m -> Long.valueOf(m.getCorrect())).collect(Collectors.toList()); // 정오답 리스트
 
-        List<Integer> diff_level_list = mergedList.stream()
-                .map(m -> m.getDiff_level()).collect(Collectors.toList()); // 문제 난이도 리스트
-
+        List<Long> diff_level_list = mergedList.stream()
+                .map(m -> Long.valueOf(m.getDiff_level())).collect(Collectors.toList()); // 문제 난이도 리스트
         // INPUT__ 객체 생성
         List<KnowledgeReqObject> inputs = new ArrayList<>();
         inputs.add(createRequestObj(0, q_idx_list));

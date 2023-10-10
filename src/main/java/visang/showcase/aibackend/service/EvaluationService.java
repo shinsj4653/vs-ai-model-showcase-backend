@@ -22,6 +22,7 @@ import visang.showcase.aibackend.mapper.DiagnosisMapper;
 import visang.showcase.aibackend.mapper.EvaluationMapper;
 import visang.showcase.aibackend.mapper.TransactionMapper;
 
+import java.sql.SQLOutput;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -55,7 +56,7 @@ public class EvaluationService {
     /**
      * RequestBody의 INPUT__ 요청 객체 생성
      */
-    private KnowledgeReqObject createRequestObj(int idx, int probSize, List<Integer> payload) {
+    private KnowledgeReqObject createRequestObj(int idx, int probSize, List<Long> payload) {
         KnowledgeReqObject obj = new KnowledgeReqObject();
         obj.setName("INPUT__" + idx);
         obj.setDatatype("INT64");
@@ -63,7 +64,7 @@ public class EvaluationService {
         List<Integer> shape = List.of(1, probSize); // 배치 사이즈, 문항 수
         obj.setShape(shape);
 
-        List<List<Integer>> data = List.of(payload);
+        List<List<Long>> data = List.of(payload);
         obj.setData(data);
 
         return obj;
@@ -92,46 +93,46 @@ public class EvaluationService {
         List<EvaluationProbRequest> evaluationResult =  request.getProb_list();
 
         // 토픽리스트 추출
-        List<Integer> diagnosisQIdxs = diagnosisResult.stream()
-                .map(m -> m.getQ_idx()).collect(Collectors.toList());
-        List<Integer> evaluationQIdxs = evaluationResult.stream()
-                .map(m -> m.getQ_idx()).collect(Collectors.toList());
+        List<Long> diagnosisQIdxs = diagnosisResult.stream()
+                .map(m -> Long.valueOf(m.getQ_idx())).collect(Collectors.toList());
+        List<Long> evaluationQIdxs = evaluationResult.stream()
+                .map(m -> Long.valueOf(m.getQ_idx())).collect(Collectors.toList());
 
         // 정오답 리스트 추출
-        List<Integer> diagnosisCorrects = diagnosisResult.stream()
-                .map(m -> m.getCorrect()).collect(Collectors.toList());
-        List<Integer> evaluationCorrects = evaluationResult.stream()
-                .map(m -> m.getCorrect()).collect(Collectors.toList());
+        List<Long> diagnosisCorrects = diagnosisResult.stream()
+                .map(m -> Long.valueOf(m.getCorrect())).collect(Collectors.toList());
+        List<Long> evaluationCorrects = evaluationResult.stream()
+                .map(m -> Long.valueOf(m.getCorrect())).collect(Collectors.toList());
 
         // 문제 난이도 리스트
-        List<Integer> diagnosisDiffs = diagnosisResult.stream()
-                .map(m -> m.getDiff_level()).collect(Collectors.toList());
-        List<Integer> evaluationDiffs = evaluationResult.stream()
-                .map(m -> m.getDiff_level()).collect(Collectors.toList());
+        List<Long> diagnosisDiffs = diagnosisResult.stream()
+                .map(m -> Long.valueOf(m.getDiff_level())).collect(Collectors.toList());
+        List<Long> evaluationDiffs = evaluationResult.stream()
+                .map(m -> Long.valueOf(m.getDiff_level())).collect(Collectors.toList());
 
         // 먼저 진단평가 + 형성평가 데이터 합치기
-        List<Integer> mergedQIdxs = Stream.of(diagnosisQIdxs, evaluationQIdxs)
+        List<Long> mergedQIdxs = Stream.of(diagnosisQIdxs, evaluationQIdxs)
                 .flatMap(Collection::stream)
                 .collect(Collectors.toList());
 
-        List<Integer> mergedCorrects = Stream.of(diagnosisCorrects, evaluationCorrects)
+        List<Long> mergedCorrects = Stream.of(diagnosisCorrects, evaluationCorrects)
                 .flatMap(Collection::stream)
                 .collect(Collectors.toList());
 
-        List<Integer> mergedDiffs = Stream.of(diagnosisDiffs, evaluationDiffs)
+        List<Long> mergedDiffs = Stream.of(diagnosisDiffs, evaluationDiffs)
                 .flatMap(Collection::stream)
                 .collect(Collectors.toList());
-        
+        System.out.println("studyReadyResult : " + studyReadyResult);
         // 학습준비를 하고 온 상태라면, 학습준비 데이터도 합쳐주기
         if (studyReadyResult != null) {
-            List<Integer> studyReadyQIdxs = studyReadyResult.stream()
-                    .map(m -> m.getQ_idx()).collect(Collectors.toList());
+            List<Long> studyReadyQIdxs = studyReadyResult.stream()
+                    .map(m -> Long.valueOf(m.getQ_idx())).collect(Collectors.toList());
 
-            List<Integer> studyReadyCorrects = studyReadyResult.stream()
-                    .map(m -> m.getCorrect()).collect(Collectors.toList());
+            List<Long> studyReadyCorrects = studyReadyResult.stream()
+                    .map(m -> Long.valueOf(m.getCorrect())).collect(Collectors.toList());
 
-            List<Integer> studyReadyDiffs = studyReadyResult.stream()
-                    .map(m -> m.getDiff_level()).collect(Collectors.toList());
+            List<Long> studyReadyDiffs = studyReadyResult.stream()
+                    .map(m -> Long.valueOf(m.getDiff_level())).collect(Collectors.toList());
 
             mergedQIdxs = Stream.of(mergedQIdxs, studyReadyQIdxs)
                     .flatMap(Collection::stream)
