@@ -1,5 +1,7 @@
 package visang.showcase.aibackend.service;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -14,9 +16,8 @@ import visang.showcase.aibackend.dto.response.study.StudyReadyProbDto;
 import visang.showcase.aibackend.dto.response.triton.RecommendProbResponse;
 import visang.showcase.aibackend.mapper.DiagnosisMapper;
 import visang.showcase.aibackend.mapper.StudyMapper;
+import visang.showcase.aibackend.mapper.TransactionMapper;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpSession;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -32,6 +33,8 @@ public class StudyService {
 
     private final DiagnosisMapper diagnosisMapper;
     private final StudyMapper studyMapper;
+    private final TransactionMapper transactionMapper;
+    private final ObjectMapper objectMapper;
 
     // 학습준비 이행 가능 여부 판단 기준이 되는 지식 수준
     public static final double THRESHOLD = 3.0;
@@ -58,16 +61,23 @@ public class StudyService {
         return studyMapper.getRecommendProblemWithQIdx(studyReadyTopicIdx);
     }
 
-    public List<StudyReadyProbDto> setStudyReadyProblems(StudyResultSaveRequest request, HttpServletRequest httpServletRequest) {
+    public List<StudyReadyProbDto> setStudyReadyProblems(StudyResultSaveRequest request, String transaction_token) {
 
         // 학습준비 문제 풀이 시퀀스
         List<StudyReadyProbDto> probList = request.getProb_list();
 
         // 학습준비 문제 풀이 시퀀스 -> 세션에 저장
-        HttpSession session = httpServletRequest.getSession();
-        session.setAttribute("studyReadyResult", probList);
+//        HttpSession session = httpServletRequest.getSession();
+//        session.setAttribute("studyReadyResult", probList);
 
-        return probList;
+        try {
+            String study_data = objectMapper.writeValueAsString(request);
+            transactionMapper.updateStudyData(transaction_token, study_data);
+
+            return probList;
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     /**

@@ -11,9 +11,16 @@
         where transaction_token = #{transaction_token};
     </select>
 
-    <insert id="insertDiagnosisData">
-        insert into ai_model_showcase.transaction_data(transaction_token, diagnosis_data)
-            values (#{transaction_token}, #{diagnosis_data})
-    </insert>
+    <update id="insertDiagnosisData">
+        update set td.diagnosis_data = #{diagnosis_data}
+        from ai_model_showcase.transaction_data td
+        where td.transaction_token = #{transaction_token}
+    </update>
+
+    <update id="updateStudyData">
+        update set td.study_data = #{study_data}
+        from ai_model_showcase.transaction_data td
+        where td.transaction_token = #{transaction_token}
+    </update>
 
 </mapper>

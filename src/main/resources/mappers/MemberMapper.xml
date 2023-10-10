@@ -10,4 +10,10 @@
         from ai_model_showcase.tb_member_info tmi
         join ai_model_showcase.tb_topic_info ttci on tmi.tgt_topic = ttci.q_idx;
     </select>
+
+    <!-- getMemberToken -->
+    <select id="saveToken" resultType="String" fetchSize="1000">
+        insert into ai_model_showcase.transaction_data(transaction_token)
+        values(#{token});
+    </select>
 </mapper>

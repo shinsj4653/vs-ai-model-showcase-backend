@@ -44,6 +44,9 @@ public class MemberService {
         claims.put("memberNo", memberNo);
         String token = tokenProvider.createToken(claims);
 
+        // transaction_data 테이블 내에 유저 토큰 값 insert
+        memberMapper.saveToken(token);
+
         // memberNo 저장한 토큰 값을 return
         return new TokenResponse(token);
     }

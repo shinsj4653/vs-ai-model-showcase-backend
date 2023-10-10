@@ -10,6 +10,7 @@ import visang.showcase.aibackend.dto.response.study.RecommendProblemDto;
 import visang.showcase.aibackend.dto.response.study.StudyReadyDto;
 import visang.showcase.aibackend.dto.response.study.StudyReadyProbDto;
 import visang.showcase.aibackend.service.StudyService;
+import visang.showcase.aibackend.util.JwtTokenProvider;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
@@ -21,6 +22,7 @@ import java.util.List;
 public class StudyController {
 
     private final StudyService studyService;
+    private final JwtTokenProvider jwtTokenProvider;
 
     @GetMapping("/isReady")
     public ResponseDto<StudyReadyDto> isStudyReady(HttpSession session) {
@@ -37,8 +39,14 @@ public class StudyController {
     }
 
     @PostMapping("/setResult")
-    public ResponseDto<List<StudyReadyProbDto>> setStudyReadyProblems(@RequestBody StudyResultSaveRequest request, HttpServletRequest httpServletRequest) {
-        return ResponseUtil.SUCCESS("학습준비 문제 풀이 시퀀스 세션에 저장 성공", studyService.setStudyReadyProblems(request, httpServletRequest));
+    public ResponseDto<List<StudyReadyProbDto>> setStudyReadyProblems(@RequestBody StudyResultSaveRequest request) {
+
+        String token = request.getTransaction_token();
+        String memberNo = jwtTokenProvider.getMemberNo(token);
+        if (memberNo != null) {
+            return ResponseUtil.SUCCESS("학습준비 문제 풀이 시퀀스 세션에 저장 성공", studyService.setStudyReadyProblems(request, token));
+        }
+        return ResponseUtil.ERROR("세션에 memberNo가 없습니다.", null);
     }
 
     //    @GetMapping("/recommend/prob/{prob_no}")
