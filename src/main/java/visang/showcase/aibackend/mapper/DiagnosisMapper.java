@@ -17,5 +17,6 @@ public interface DiagnosisMapper {
 
     List<TopicInfoRow> getTopicNamesWithQIdxs(@Param("qIdxs") List<Integer> qIdxs);
 
+    String getIntelligenceMapHtml(@Param("memberNo") String memberNo);
 
 }
