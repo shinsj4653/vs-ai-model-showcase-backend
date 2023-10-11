@@ -80,10 +80,14 @@ public class EvaluationService {
         String studyData = transactionMapper.getStudyData(token);
 
         List<DiagnosisProblemDto> diagnosisResult;
-        List<StudyReadyProbDto> studyReadyResult;
+        List<StudyReadyProbDto> studyReadyResult = null;
         try{
             diagnosisResult = List.of(objectMapper.readValue(diagnosisData, DiagnosisProblemDto[].class));
-            studyReadyResult = List.of(objectMapper.readValue(studyData, StudyReadyProbDto[].class));
+            
+            // 학습준비 데이터가 null이 아닐 경우에만 리스트로 변환해주기
+            if (studyData != null)
+                studyReadyResult = List.of(objectMapper.readValue(studyData, StudyReadyProbDto[].class));
+            
         } catch (JsonMappingException e) {
             throw new RuntimeException(e);
         } catch (JsonProcessingException e) {
@@ -122,9 +126,8 @@ public class EvaluationService {
         List<Long> mergedDiffs = Stream.of(diagnosisDiffs, evaluationDiffs)
                 .flatMap(Collection::stream)
                 .collect(Collectors.toList());
-        System.out.println("studyReadyResult : " + studyReadyResult);
         // 학습준비를 하고 온 상태라면, 학습준비 데이터도 합쳐주기
-        if (studyReadyResult != null) {
+        if (studyData != null) {
             List<Long> studyReadyQIdxs = studyReadyResult.stream()
                     .map(m -> Long.valueOf(m.getQ_idx())).collect(Collectors.toList());
 
