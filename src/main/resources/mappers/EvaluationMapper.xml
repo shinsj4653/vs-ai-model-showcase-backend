@@ -21,7 +21,47 @@
         from ai_model_showcase.tb_prob_info tpi
         join ai_model_showcase.tb_topic_info tti on tpi.q_idx = tti.q_idx
         where tti.q_idx = #{qIdx}
-        order by tpi.main_prob_diff desc
+        order by tpi.prob_no asc
         limit 5;
     </select>
+
+    <select id="getNextRecommendProblem" resultType="EvaluationProblemDto" fetchSize="1000">
+        select tti.q_idx,
+               tpi.main_prob_diff as diff_level,
+               tpi.prob_no,
+               0 as correct,
+               tti.topic_nm,
+               tti.categ_cd,
+               tti.categ_nm,
+               tti.chapter_nm,
+               tti.section_nm,
+               tti.subsection_nm,
+               tpi.imgpath,
+               tpi.mv_path as video_url
+        from ai_model_showcase.tb_prob_info tpi
+        join ai_model_showcase.tb_topic_info tti on tpi.q_idx = tti.q_idx
+        where tti.q_idx = #{qIdx}
+        order by tpi.prob_no asc;
+    </select>
+
+<!--    &lt;!&ndash; GET /evaluation/nextProblem &ndash;&gt;-->
+<!--    <select id="getProblems" resultType="EvaluationProblemDto" fetchSize="1000">-->
+<!--        select tti.q_idx,-->
+<!--               tpi.main_prob_diff as diff_level,-->
+<!--               tpi.prob_no,-->
+<!--               0 as correct,-->
+<!--               tti.topic_nm,-->
+<!--               tti.categ_cd,-->
+<!--               tti.categ_nm,-->
+<!--               tti.chapter_nm,-->
+<!--               tti.section_nm,-->
+<!--               tti.subsection_nm,-->
+<!--               tpi.imgpath,-->
+<!--               tpi.mv_path as video_url-->
+<!--        from ai_model_showcase.tb_prob_info tpi-->
+<!--        join ai_model_showcase.tb_topic_info tti on tpi.q_idx = tti.q_idx-->
+<!--        where tti.q_idx = #{qIdx} and tpi.main_prob_diff = #{diffLevel}-->
+<!--        limit 1;-->
+<!--    </select>-->
+
 </mapper>

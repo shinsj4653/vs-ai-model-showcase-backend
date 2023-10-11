@@ -40,10 +40,10 @@ public class StudyController {
 
         String token = request.getTransaction_token();
         String memberNo = jwtTokenProvider.getMemberNo(token);
-        if (memberNo != null) {
+        if (memberNo != null)
             return ResponseUtil.SUCCESS("학습준비 문제 풀이 시퀀스 세션에 저장 성공", studyService.setStudyReadyProblems(request, token));
-        }
-        return ResponseUtil.ERROR("세션에 memberNo가 없습니다.", null);
+        else
+            return ResponseUtil.ERROR("memberNo가 없습니다.", null);
     }
 
     //    @GetMapping("/recommend/prob/{prob_no}")

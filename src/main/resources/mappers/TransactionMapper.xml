@@ -23,6 +23,12 @@
         where transaction_token = #{transaction_token};
     </select>
 
+    <select id="getEvaluationData" resultType="String" fetchSize="1000">
+        select evaluation_data
+        from ai_model_showcase.transaction_data
+        where transaction_token = #{transaction_token};
+    </select>
+
     <update id="updateDiagnosisData">
         update ai_model_showcase.transaction_data
         set diagnosis_data = #{diagnosis_data}
@@ -38,6 +44,12 @@
     <update id="updateTgtTopicKnowledgeRate">
         update ai_model_showcase.transaction_data
         set tgt_topic_knowledge_rate = #{tgtTopicKnowledgeRate}
+        where transaction_token = #{transaction_token}
+    </update>
+
+    <update id="updateEvaluationData">
+        update ai_model_showcase.transaction_data
+        set evaluation_data = #{evaluation_data}
         where transaction_token = #{transaction_token}
     </update>
 

@@ -8,5 +8,9 @@ import java.util.List;
 
 @Mapper
 public interface EvaluationMapper {
+
     List<EvaluationProblemDto> getProblems(@Param("qIdx") Integer qIdx);
+
+    List<EvaluationProblemDto> getNextRecommendProblem(@Param("qIdx") Integer qIdx);
+
 }
