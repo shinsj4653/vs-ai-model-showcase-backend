@@ -28,10 +28,10 @@ public class MemberController {
 
         TokenResponse result = memberService.setMemberNo(memberNoRequest);
 
-        if (result == null) {
+        if (result == null)
             return ResponseUtil.FAILURE("존재하지 않는 회원입니다.", null);
-        } else {
+        else
             return ResponseUtil.SUCCESS("학생번호 선택 완료.", result);
-        }
+
     }
 }

@@ -7,11 +7,15 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 import visang.showcase.aibackend.dto.request.evaluation.EvaluationDashboardRequest;
+import visang.showcase.aibackend.dto.request.evaluation.EvaluationNextProbRequest;
 import visang.showcase.aibackend.dto.request.evaluation.EvaluationProbRequest;
 import visang.showcase.aibackend.dto.request.triton.KnowledgeLevelRequest;
 import visang.showcase.aibackend.dto.request.triton.KnowledgeReqObject;
 import visang.showcase.aibackend.dto.response.diagnosis.DiagnosisProblemDto;
+import visang.showcase.aibackend.dto.response.evaluation.EvaluationContinueDto;
+import visang.showcase.aibackend.dto.response.evaluation.EvaluationProbSaveDto;
 import visang.showcase.aibackend.dto.response.evaluation.EvaluationProblemDto;
+import visang.showcase.aibackend.dto.response.evaluation.EvaluationStartDto;
 import visang.showcase.aibackend.dto.response.evaluation.dashboard.CheckProbDto;
 import visang.showcase.aibackend.dto.response.evaluation.dashboard.EvaluationDashboardResult;
 import visang.showcase.aibackend.dto.response.evaluation.dashboard.TopicLevelChangeDto;
@@ -23,9 +27,7 @@ import visang.showcase.aibackend.mapper.EvaluationMapper;
 import visang.showcase.aibackend.mapper.TransactionMapper;
 
 import java.sql.SQLOutput;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -48,9 +50,17 @@ public class EvaluationService {
      * 형성평가 문항 5개 조회
      * @param memberNo 학생번호
      */
-    public List<EvaluationProblemDto> getProblems(String memberNo) {
+    public List<EvaluationStartDto> getProblems(String memberNo, String token) {
+
+        // 현재 지식수준 가져오기
+        Double knowledgeRate = transactionMapper.getTgtTopicKnowledgeRate(token);
+
         Integer qIdx = diagnosisMapper.getTgtTopic(memberNo);
-        return evaluationMapper.getProblems(qIdx);
+        return evaluationMapper.getProblems(qIdx).stream()
+                .map(item -> {
+                    return new EvaluationStartDto(item, token, knowledgeRate);
+                })
+                .collect(Collectors.toList());
     }
 
     /**
@@ -237,5 +247,205 @@ public class EvaluationService {
         }
 
         return result;
+    }
+
+
+    // 지식추론 통신 로직 리팩토링해서 분리 고민 -> 코드 재활용
+    // 1문제씩 누적시켜서 저장하기 때문에
+    // 형성평가 최종 결과 대시보드 부분도 누적시킨 데이터를 조회하도록 변경해면 될듯
+    private KnowledgeLevelRequest createNextKnowledgeRateRequest(String token, EvaluationNextProbRequest request) {
+        // 진단평가 문제 100개 + 학습준비 문제 5개 + 형성평가 문제 데이터
+        String diagnosisData = transactionMapper.getDiagnosisData(token);
+        String studyData = transactionMapper.getStudyData(token);
+        String prevEvaluationData = transactionMapper.getEvaluationData(token);
+
+        // 첫 형성평가 문제인 경우 -> 누적 x
+        if (prevEvaluationData == null) {
+            // 형성평가 데이터 저장
+            try {
+                List<EvaluationProbSaveDto> data = List.of(new EvaluationProbSaveDto(request.getQ_idx(), request.getDiff_level(), request.getCorrect()));
+                String json = objectMapper.writeValueAsString(data);
+                transactionMapper.updateEvaluationData(token, json);
+            } catch (JsonProcessingException e) {
+                throw new RuntimeException(e);
+            }
+
+        } else { // 이전 형성평가 문제들에 누적시키기
+            try {
+                // 이전 데이터 조회 후 누적
+                EvaluationProbSaveDto[] prevData = objectMapper.readValue(prevEvaluationData, EvaluationProbSaveDto[].class);
+                                                EvaluationProbSaveDto prob = new EvaluationProbSaveDto(request.getQ_idx(), request.getDiff_level(), request.getCorrect());
+                List<EvaluationProbSaveDto> data = Arrays.stream(prevData).collect(Collectors.toList());
+                data.add(prob);
+
+                // 누적시킨 형성평가 데이터 저장
+                String content = objectMapper.writeValueAsString(data);
+                transactionMapper.updateEvaluationData(token,content);
+
+            } catch (JsonProcessingException e) {
+                throw new RuntimeException(e);
+            }
+        }
+
+        List<DiagnosisProblemDto> diagnosisResult;
+        List<StudyReadyProbDto> studyReadyResult = null;
+        List<EvaluationProbSaveDto> evaluationResult;
+
+        String nextEvaluationData = transactionMapper.getEvaluationData(token);
+
+        try {
+            diagnosisResult = List.of(objectMapper.readValue(diagnosisData, DiagnosisProblemDto[].class));
+
+            // 학습준비 데이터가 null이 아닐 경우에만 리스트로 변환해주기
+            if (studyData != null)
+                studyReadyResult = List.of(objectMapper.readValue(studyData, StudyReadyProbDto[].class));
+
+            evaluationResult = List.of(objectMapper.readValue(nextEvaluationData, EvaluationProbSaveDto[].class));
+
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException(e);
+        }
+
+        // 토픽리스트 추출
+        List<Long> diagnosisQIdxs = diagnosisResult.stream()
+                .map(m -> Long.valueOf(m.getQ_idx())).collect(Collectors.toList());
+        List<Long> evaluationQIdxs = evaluationResult.stream()
+                .map(m -> Long.valueOf(m.getQ_idx())).collect(Collectors.toList());
+
+        // 정오답 리스트 추출
+        List<Long> diagnosisCorrects = diagnosisResult.stream()
+                .map(m -> Long.valueOf(m.getCorrect())).collect(Collectors.toList());
+        List<Long> evaluationCorrects = evaluationResult.stream()
+                .map(m -> Long.valueOf(m.getCorrect())).collect(Collectors.toList());
+
+        // 문제 난이도 리스트
+        List<Long> diagnosisDiffs = diagnosisResult.stream()
+                .map(m -> Long.valueOf(m.getDiff_level())).collect(Collectors.toList());
+        List<Long> evaluationDiffs = evaluationResult.stream()
+                .map(m -> Long.valueOf(m.getDiff_level())).collect(Collectors.toList());
+
+        // 먼저 진단평가 + 형성평가 데이터 합치기
+        List<Long> mergedQIdxs = Stream.of(diagnosisQIdxs, evaluationQIdxs)
+                .flatMap(Collection::stream)
+                .collect(Collectors.toList());
+
+        List<Long> mergedCorrects = Stream.of(diagnosisCorrects, evaluationCorrects)
+                .flatMap(Collection::stream)
+                .collect(Collectors.toList());
+
+        List<Long> mergedDiffs = Stream.of(diagnosisDiffs, evaluationDiffs)
+                .flatMap(Collection::stream)
+                .collect(Collectors.toList());
+        // 학습준비를 하고 온 상태라면, 학습준비 데이터도 합쳐주기
+        if (studyData != null) {
+            List<Long> studyReadyQIdxs = studyReadyResult.stream()
+                    .map(m -> Long.valueOf(m.getQ_idx())).collect(Collectors.toList());
+
+            List<Long> studyReadyCorrects = studyReadyResult.stream()
+                    .map(m -> Long.valueOf(m.getCorrect())).collect(Collectors.toList());
+
+            List<Long> studyReadyDiffs = studyReadyResult.stream()
+                    .map(m -> Long.valueOf(m.getDiff_level())).collect(Collectors.toList());
+
+            mergedQIdxs = Stream.of(mergedQIdxs, studyReadyQIdxs)
+                    .flatMap(Collection::stream)
+                    .collect(Collectors.toList());
+
+            mergedCorrects = Stream.of(mergedCorrects, studyReadyCorrects)
+                    .flatMap(Collection::stream)
+                    .collect(Collectors.toList());
+
+            mergedDiffs = Stream.of(mergedDiffs, studyReadyDiffs)
+                    .flatMap(Collection::stream)
+                    .collect(Collectors.toList());
+        }
+
+        // INPUT__ 객체 생성
+        List<KnowledgeReqObject> inputs = new ArrayList<>();
+        inputs.add(createRequestObj(0, mergedQIdxs.size(), mergedQIdxs));
+        inputs.add(createRequestObj(1, mergedCorrects.size(), mergedCorrects));
+        inputs.add(createRequestObj(2, mergedDiffs.size(), mergedDiffs));
+
+        return new KnowledgeLevelRequest(inputs);
+    }
+
+    public Map<Integer, List<EvaluationProblemDto>> getProbMapByDiffLevel(List<EvaluationProblemDto> problems) {
+        return problems.stream().collect(Collectors.groupingBy(EvaluationProblemDto::getDiff_level));
+    }
+
+    public EvaluationProblemDto getNextProblemInfo(String memberNo, EvaluationNextProbRequest request) {
+
+        // tgtTopic 가져오기
+        Integer tgtTopic = diagnosisMapper.getTgtTopic(memberNo);
+
+        // 난이도에 따른 문항 정보 Map 생성
+        List<EvaluationProblemDto> problems = evaluationMapper.getNextRecommendProblem(tgtTopic);
+        Map<Integer, List<EvaluationProblemDto>> probMap = getProbMapByDiffLevel(problems);
+
+        // correct에 따른 난이도 처리 다르게
+        Integer correct = request.getCorrect();
+        Integer diffLevel = request.getDiff_level();
+
+        List<Integer> diffLevelList = new ArrayList<>(probMap.keySet());
+        Collections.sort(diffLevelList); // 오름차순 정렬
+        // 기준 난이도 Idx 구하기
+        int diffLevelIdx = diffLevelList.indexOf(diffLevel);
+
+        // 난이도 판별 후, 가져올 문제 리스트
+        List<EvaluationProblemDto> newProblems;
+
+        // 맞았을 경우
+        if (correct == 1) {
+
+            // 해당 타켓 토픽에서 이미 가장 높은 난이도면, 동일한 난이도에서 문제 가져오기
+            // 새로운 난이도 있는 경우, 업데이트 된 난이도에서 문제 가져오기
+            if (diffLevelIdx + 1 == diffLevelList.size()) {
+                newProblems = probMap.get(diffLevelList.get(diffLevelIdx));
+            } else{
+                newProblems = probMap.get(diffLevelList.get(diffLevelIdx + 1));
+            }
+
+        } else { // 틀렸을 경우
+
+            // 해당 타켓 토픽에서 이미 가장 낮은 난이도면, 동일한 난이도에서 문제 가져오기
+            // 새로운 난이도 있는 경우, 업데이트 된 난이도에서 문제 가져오기
+            if (diffLevelIdx - 1 < 0) {
+                newProblems = probMap.get(diffLevelList.get(diffLevelIdx));
+            } else {
+                newProblems = probMap.get(diffLevelList.get(diffLevelIdx - 1));
+            }
+
+        }
+
+        EvaluationProblemDto result = null;
+
+        // 문항 리스트 중, 이전 문제와 중복되지 않는 문제 반환
+        for (EvaluationProblemDto newProblem : newProblems) {
+            if (Integer.parseInt(newProblem.getProb_no()) > Integer.parseInt(request.getProb_no())) {
+                result = newProblem;
+                break;
+            }
+
+        }
+        return result;
+    }
+
+    public EvaluationContinueDto getNextProblem(String token, String memberNo, EvaluationNextProbRequest request) {
+
+        // 난이도와 o,x 여부에 따른 새로운 문항 추천
+        EvaluationProblemDto nextProblem = getNextProblemInfo(memberNo, request);
+
+        // 형성평가 데이터를 1문제씩 누적시킨후 지식추론값 가져오기
+        KnowledgeLevelRequest tritonRequest = createNextKnowledgeRateRequest(token, request);
+        KnowledgeLevelResponse response = postWithKnowledgeLevelTriton(tritonRequest);
+        // 지식수준 추론 결과
+        List<Double> knowledgeRates = response.getOutputs()
+                .get(0)
+                .getData();
+        // 바뀐 지식추론값 반환
+        Integer tgtTopic = diagnosisMapper.getTgtTopic(memberNo);
+        Double newKnowledgeRate = knowledgeRates.get(tgtTopic);
+
+        return new EvaluationContinueDto(token, newKnowledgeRate, nextProblem);
     }
 }

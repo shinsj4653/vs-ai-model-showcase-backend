@@ -20,4 +20,9 @@ public interface TransactionMapper {
     String getStudyData(@Param("transaction_token") String transaction_token);
     void updateStudyData(@Param("transaction_token") String transaction_token, @Param("study_data") String study_data);
 
+    // 형성평가 데이터
+    String getEvaluationData(@Param("transaction_token") String transaction_token);
+    void updateEvaluationData(@Param("transaction_token") String transaction_token, @Param("evaluation_data") String evaluation_data);
+
+
 }
