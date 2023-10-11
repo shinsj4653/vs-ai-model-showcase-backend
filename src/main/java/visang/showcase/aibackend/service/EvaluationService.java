@@ -50,17 +50,17 @@ public class EvaluationService {
      * 형성평가 문항 5개 조회
      * @param memberNo 학생번호
      */
-    public EvaluationStartDto getProblems(String memberNo, String token) {
-        EvaluationStartDto result = new EvaluationStartDto();
+    public List<EvaluationStartDto> getProblems(String memberNo, String token) {
+
         // 현재 지식수준 가져오기
         Double knowledgeRate = transactionMapper.getTgtTopicKnowledgeRate(token);
 
         Integer qIdx = diagnosisMapper.getTgtTopic(memberNo);
-        result.setProb_list(evaluationMapper.getProblems(qIdx));
-        result.setKnowledgeRate(knowledgeRate);
-        result.setTransaction_token(token);
-
-        return result;
+        return evaluationMapper.getProblems(qIdx).stream()
+                .map(item -> {
+                    return new EvaluationStartDto(item, token, knowledgeRate);
+                })
+                .collect(Collectors.toList());
     }
 
     /**

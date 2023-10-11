@@ -26,7 +26,7 @@ public class EvaluationController {
     private final JwtTokenProvider jwtTokenProvider;
 
     @PostMapping("/getProblems")
-    public ResponseDto<EvaluationStartDto> getProblems(@RequestBody TokenRequest tokenRequest) {
+    public ResponseDto<List<EvaluationStartDto>> getProblems(@RequestBody TokenRequest tokenRequest) {
         String token = tokenRequest.getTransaction_token();
         String memberNo = jwtTokenProvider.getMemberNo(token);
         return ResponseUtil.SUCCESS("형성평가 문항 5개 조회 성공", evaluationService.getProblems(memberNo, token));

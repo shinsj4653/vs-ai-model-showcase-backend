@@ -21,6 +21,4 @@ public class EvaluationProblemDto {
     private String subsection_nm; // 소단원 한글명
     private String imgpath; // 문제 이미지 url
     private String video_url; // 문제 학습 동영상 url
-
-
 }
