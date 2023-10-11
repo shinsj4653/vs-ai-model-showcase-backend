@@ -21,7 +21,6 @@
         from ai_model_showcase.tb_prob_info tpi
         join ai_model_showcase.tb_topic_info tti on tpi.q_idx = tti.q_idx
         where tti.q_idx = #{qIdx}
-        order by tpi.main_prob_diff desc
-        limit 5;
+        order by tpi.main_prob_diff desc;
     </select>
 </mapper>

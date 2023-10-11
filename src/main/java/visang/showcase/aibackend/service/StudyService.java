@@ -68,13 +68,19 @@ public class StudyService {
         RecommendProbResponse recommendProbResponse = postWithRecommendTriton(recommendProbRequest);
 
         // 학습준비에 필요한 토픽 배열의 맨 첫 토픽Idx 가져오기
-        Integer studyReadyTopicIdx = (Integer) recommendProbResponse.getOutputs()
+        List<Object> qIdxList = recommendProbResponse.getOutputs()
                 .get(1)
-                .getData()
-                .get(0);
+                .getData();
+
+        List<RecommendProblemDto> result = new ArrayList<>();
+
+        for (Object qIdx : qIdxList) {
+            Integer idx = (Integer) qIdx;
+            result.add(studyMapper.getRecommendProblemWithQIdx(idx).get(0));
+        }
 
         // 토픽 Idx에 해당하는 문항 5개 가져오기
-        return studyMapper.getRecommendProblemWithQIdx(studyReadyTopicIdx);
+        return result;
     }
 
     public List<StudyReadyProbDto> setStudyReadyProblems(StudyResultSaveRequest request, String transaction_token) {
