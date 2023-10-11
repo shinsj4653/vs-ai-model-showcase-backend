@@ -9,6 +9,7 @@
         select tti.q_idx,
                tpi.main_prob_diff as diff_level,
                tpi.prob_no,
+               0 as correct,
                tti.topic_nm,
                tti.categ_cd,
                tti.categ_nm,
