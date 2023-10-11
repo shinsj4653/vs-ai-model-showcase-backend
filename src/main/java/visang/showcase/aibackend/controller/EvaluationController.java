@@ -50,7 +50,7 @@ public class EvaluationController {
 
         if (memberNo != null) {
             EvaluationContinueDto nextProblem = evaluationService.getNextProblem(token, memberNo, request);
-            return ResponseUtil.SUCCESS("형성평가 결과 대시보드 데이터 조회 성공",nextProblem);
+            return ResponseUtil.SUCCESS("형성평가 문항 결과에 따른 새로운 문항 추천 성공",nextProblem);
         } else{
             return ResponseUtil.FAILURE("memberNo가 토큰에 존재하지 않습니다.", null);
         }
