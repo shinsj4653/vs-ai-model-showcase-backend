@@ -42,7 +42,7 @@ public class EvaluationController {
         return ResponseUtil.SUCCESS("형성평가 결과 대시보드 데이터 조회 성공", response);
     }
 
-    @PostMapping("/getNextKnowledgeRate")
+    @PostMapping("/getNextProblem")
     public ResponseDto<EvaluationContinueDto> getNextKnowledgeRage(@RequestBody EvaluationNextProbRequest request) {
 
         String token = request.getTransaction_token();
