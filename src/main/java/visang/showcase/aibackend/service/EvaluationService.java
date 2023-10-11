@@ -427,6 +427,12 @@ public class EvaluationService {
             }
 
         }
+
+        // 만약 난이도 내에서 마지막 문항일 시, 해당 난이도의 첫 문항을 반환
+        if (result == null) {
+            result = newProblems.get(0);
+        }
+
         return result;
     }
 

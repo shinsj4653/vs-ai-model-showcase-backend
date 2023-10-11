@@ -7,6 +7,6 @@ import java.util.List;
 @Data
 public class EvaluationContinueDto {
     private final String transaction_token;
-    private final Double knowledgeRate;
+    private final Double knowledge_rate;
     private final EvaluationProblemDto prob_info;
 }

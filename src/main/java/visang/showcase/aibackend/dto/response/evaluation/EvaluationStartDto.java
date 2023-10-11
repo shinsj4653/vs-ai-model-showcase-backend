@@ -20,7 +20,7 @@ public class EvaluationStartDto {
     private String video_url; // 문제 학습 동영상 url
 
     private String transaction_token;
-    private Double knowledgeRate;
+    private Double knowledge_rate;
 
     public EvaluationStartDto(EvaluationProblemDto dto, String token, Double knowledgeRate) {
         this.q_idx = dto.getQ_idx();
@@ -37,6 +37,6 @@ public class EvaluationStartDto {
         this.video_url = dto.getVideo_url();
 
         this.transaction_token = token;
-        this.knowledgeRate = knowledgeRate;
+        this.knowledge_rate = knowledgeRate;
     }
 }
