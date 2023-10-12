@@ -82,7 +82,7 @@ public class EvaluationService {
         List<List<Double>> map = (List<List<Double>>) jsonObject.get("map");
 
         // 타켓 토픽에 해당되는 연관도 라인 가져와서 내림차순 정렬
-        List<Double> tgtTopicLine = map.get(1);
+        List<Double> tgtTopicLine = map.get(tgtTopicIdx);
         List<TopicValue> topicValues = new ArrayList<>();
 
         for (int i = 0; i < tgtTopicLine.size(); i++) {
