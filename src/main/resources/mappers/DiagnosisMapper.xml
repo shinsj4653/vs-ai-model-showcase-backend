@@ -65,6 +65,17 @@
         </foreach>
     </select>
 
+    <!-- 타켓 토픽, subject_cd에 해당하는 categ_nm 뽑아오기 -->
+    <select id="getCategoryNames" resultType="String" fetchSize="1000">
+        select distinct categ_nm
+        from ai_model_showcase.tb_topic_info tti
+        where tti.subject_cd in (
+            select subject_cd
+            from ai_model_showcase.tb_topic_info tti
+            where tti.q_idx = #{qIdx}
+        );
+    </select>
+
     <!-- GET intelligence_map_html -->
     <select id="getIntelligenceMapHtml" resultType="String" fetchSize="1000">
         select intelligence_map_html

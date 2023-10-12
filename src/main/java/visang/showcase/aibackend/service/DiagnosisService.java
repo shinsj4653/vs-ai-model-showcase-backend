@@ -60,6 +60,11 @@ public class DiagnosisService {
     }
 
     /**
+     * 타켓 토픽에 해당하는 subject_cd 에 해당하는 categ_nm 구하기
+     */
+    public List<String getCategoryNm
+
+    /**
      * category_cd를 저장할 Set 생성
      * category_cd와 category_nm 매핑
      * category_cd와 category_nm 매핑
