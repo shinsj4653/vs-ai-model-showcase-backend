@@ -60,6 +60,11 @@ public class DiagnosisService {
     }
 
     /**
+     * 타켓 토픽에 해당하는 subject_cd 에 해당하는 categ_nm 구하기
+     */
+    public List<String getCategoryNm
+
+    /**
      * category_cd를 저장할 Set 생성
      * category_cd와 category_nm 매핑
      * category_cd와 category_nm 매핑
@@ -197,7 +202,7 @@ public class DiagnosisService {
         result.setStrong_level(strongWeakKnowledgeResponse.getStrong_level());
         result.setWeak_level(strongWeakKnowledgeResponse.getWeak_level());
         // 앞으로 배울 토픽의 예상 지식 수준
-        List<ExpectedTopicResponse> expectedTopics = calculateExpectedKnowledgeLevel(request, knowledgeRates);
+        List<ExpectedTopicResponse> expectedTopics = calculateExpectedKnowledgeLevel(memberNo, request, knowledgeRates);
         result.setFuture_topic_level_expectation(expectedTopics);
 
         // 지식 맵 html 코드
@@ -314,7 +319,7 @@ public class DiagnosisService {
                     .get();
             // 지식수준의 평균 계산
             Double avg = sum / qIdxs.size();
-            // 소수점 둘째자리까지 반올림
+            // 소수점 셋째자리까지 반올림
             Double knowledgeLevel = Double.valueOf(String.format("%.2f", avg));
 
             areaKnowledges.add(new AreaKnowledgeResponse(categoryNames.get(categoryCode), knowledgeLevel, "진단평가"));
@@ -338,7 +343,7 @@ public class DiagnosisService {
         // 토픽별 지식수준 추론값 추출
         List<TopicKnowledge> topicKnowledges = new ArrayList<>();
         for (int qIdx : targetTopics) {
-            Double knowledgeRate = knowledgeRates.get(qIdx);
+            Double knowledgeRate = Double.valueOf(String.format("%.2f", knowledgeRates.get(qIdx)));
             topicKnowledges.add(new TopicKnowledge(qIdx, topicNames.get(qIdx), knowledgeRate));
         }
 
@@ -368,22 +373,25 @@ public class DiagnosisService {
      * @param knowledgeRates 트리톤 서버에서 받은 지식수준 추론 결과
      * @return List<ExpectedTopicResponse> 반환
      */
-    private List<ExpectedTopicResponse> calculateExpectedKnowledgeLevel(DiagnosisDashboardRequest request, List<Double> knowledgeRates) {
+    private List<ExpectedTopicResponse> calculateExpectedKnowledgeLevel(String memberNo, DiagnosisDashboardRequest request, List<Double> knowledgeRates) {
         // 진단평가 마지막 문제 토픽 추출
-        int lastIdx = request.getProb_list().size() - 1;
-        int lastQIdx = request.getProb_list().get(lastIdx).getQ_idx();
+//        int lastIdx = request.getProb_list().size() - 1;
+//        int lastQIdx = request.getProb_list().get(lastIdx).getQ_idx();
+        
+        // 진단평가의 마지막문항의 토픽 idx가 기준이 아닌, 학생의 타켓 토픽 idx가 기준
+        Integer tgtTopicIdx = diagnosisMapper.getTgtTopic(memberNo);
 
         // 5개의 다음 토픽 인덱스 계산
         List<Integer> nextQIdxs = new ArrayList<>();
         for (int i = 1; i <= 5; i++) {
-            int nextQIdx = (lastQIdx + i) % TOTAL_TOPIC_COUNT; // 0 ~ 316
+            int nextQIdx = (tgtTopicIdx + i) % TOTAL_TOPIC_COUNT; // 0 ~ 316
             nextQIdxs.add(nextQIdx);
         }
 
         List<ExpectedTopicResponse> result = new ArrayList<>();
         // 토픽 인덱스 5개에 해당하는 토픽이름 데이터 조회 및 지식수준 추출
         diagnosisMapper.getTopicNamesWithQIdxs(nextQIdxs)
-                .forEach((row) -> result.add(new ExpectedTopicResponse(row.getTopic_nm(), knowledgeRates.get(row.getQ_idx()))));
+                .forEach((row) -> result.add(new ExpectedTopicResponse(row.getTopic_nm(), Double.valueOf(String.format("%.2f", knowledgeRates.get(row.getQ_idx()))))));
 
         return result;
     }

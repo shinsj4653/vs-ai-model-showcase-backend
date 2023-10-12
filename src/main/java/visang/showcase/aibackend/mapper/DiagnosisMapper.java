@@ -19,4 +19,6 @@ public interface DiagnosisMapper {
 
     String getIntelligenceMapHtml(@Param("memberNo") String memberNo);
 
+    List<String> getCategoryNames(@Param("qIdx") Integer qIdx);
+
 }
