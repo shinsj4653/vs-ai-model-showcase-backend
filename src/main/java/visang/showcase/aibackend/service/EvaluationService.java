@@ -306,7 +306,7 @@ public class EvaluationService {
             // 틀린문제 문항번호 추출
             List<Integer> prob_idxs = request.getProb_list()
                     .stream()
-                    .filter((prob) -> prob.getCorrect() == 0) // 오답인 경우
+                    .filter((prob) -> prob.getCorrect() == 0 && prob.getDiff_level() < after) // 오답인 경우
                     .map((prob) -> prob_nos.indexOf(prob.getProb_no()) + 1)
                     .collect(Collectors.toList());
             // 틀린문제가 존재하는 경우
@@ -317,7 +317,7 @@ public class EvaluationService {
             // 맞은문제 문항번호 추출
             List<Integer> prob_idxs = request.getProb_list()
                     .stream()
-                    .filter((prob) -> prob.getCorrect() == 1) // 정답인 경우
+                    .filter((prob) -> prob.getCorrect() == 1 && prob.getDiff_level() >= after) // 정답인 경우
                     .map((prob) -> prob_nos.indexOf(prob.getProb_no()) + 1)
                     .collect(Collectors.toList());
             // 맞은문제가 존재하는 경우
@@ -487,7 +487,7 @@ public class EvaluationService {
             // 새로운 난이도 있는 경우, 업데이트 된 난이도에서 문제 가져오기
             if (diffLevelIdx + 1 == diffLevelList.size()) {
                 newProblems = probMap.get(diffLevelList.get(diffLevelIdx));
-            } else{
+            } else {
                 newProblems = probMap.get(diffLevelList.get(diffLevelIdx + 1));
             }
 

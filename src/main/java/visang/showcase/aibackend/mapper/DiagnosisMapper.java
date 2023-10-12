@@ -22,4 +22,6 @@ public interface DiagnosisMapper {
 
     List<AreaCategoryDto> getCategoriesWithMemberNo(@Param("memberNo") String memberNo);
 
+    String getTgtTopicName(@Param("qIdx") Integer qIdx);
+
 }

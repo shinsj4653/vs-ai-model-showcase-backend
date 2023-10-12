@@ -54,6 +54,12 @@
         where tmi.member_no = #{memberNo};
     </select>
 
+    <select id="getTgtTopicName" resultType="String" fetchSize="1000">
+        select q_nm
+        from ai_model_showcase.tb_topic_info tti
+        where tti.q_idx = #{qIdx}
+    </select>
+
     <!-- GET /diagnosis/dashboard : 영역별 포함된 q_idx 값 가져오기 -->
     <select id="getTopicNamesWithQIdxs" resultType="TopicInfoRow" parameterType="java.util.List" fetchSize="1000">
         select tti.q_idx,

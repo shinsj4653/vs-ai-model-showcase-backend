@@ -32,4 +32,7 @@ public class DashboardDto {
     /* 지식 맵 html 코드 */
     private String intelligence_map_html;
 
+    /* 타켓 토픽 명 */
+    private String tgtTopicName;
+
 }

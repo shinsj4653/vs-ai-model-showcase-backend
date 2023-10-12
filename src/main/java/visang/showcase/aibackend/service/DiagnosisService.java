@@ -32,7 +32,7 @@ public class DiagnosisService {
     private static final String CORRECT_ANSWER_KEY = "yes";
     private static final String WRONG_ANSWER_KEY = "no";
     // 강약 판단기준
-    private static final double THRESHOLD = 3.0;
+    private static final double THRESHOLD = 4.0;
     // 토픽 총 개수
     private static final int TOTAL_TOPIC_COUNT = 317;
     // 트리톤 서버 URL
@@ -208,6 +208,12 @@ public class DiagnosisService {
         // 지식 맵 html 코드
         String intelligenceMapHtml = diagnosisMapper.getIntelligenceMapHtml(memberNo);
         result.setIntelligence_map_html(intelligenceMapHtml);
+
+        // 타켓 토픽 명
+        Integer tgtTopic = diagnosisMapper.getTgtTopic(memberNo);
+
+        String tgtTopicName = diagnosisMapper.getTgtTopicName(tgtTopic);
+        result.setTgtTopicName(tgtTopicName);
 
         return result;
     }
