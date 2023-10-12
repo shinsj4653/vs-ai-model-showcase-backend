@@ -55,6 +55,9 @@ public class EvaluationService {
     private final TransactionMapper transactionMapper;
     private final ObjectMapper objectMapper;
 
+
+
+
     /**
      * 연관토픽 구하는 로직
      */
@@ -65,7 +68,12 @@ public class EvaluationService {
         System.out.println(System.getProperty("user.dir"));
 
         // json 파일 읽기
-        Reader reader = new FileReader(System.getProperty("user.dir") + "/src/main/resources/json/topicmap_v0.json");
+        // 서버 주소
+        Reader reader = new FileReader("../../home/ubuntu/deploy/ai_model_showcase_backend/src/main/resources/json/topicmap_v0.json");
+
+        // 로컬 주소
+//        Reader reader = new FileReader(System.getProperty("user.dir") + "/src/main/resources/json/topicmap_v0.json");
+        
         JSONObject jsonObject = (JSONObject) parser.parse(reader);
 
         reader.close();
@@ -317,7 +325,7 @@ public class EvaluationService {
             // 실수로 틀린 문항정보는 null로 반환
             result.setMistake_prob(new CheckProbDto(new ArrayList<>(), topicName, after, relatedRate));
         } else { // 둘 다 해당 안될 경우, 빈 리스트 반환
-           
+
             // 맞은문제가 존재하는 경우
             result.setCheck_prob(new CheckProbDto(new ArrayList<>(), topicName, after, relatedRate));
             // 실수로 틀린 문항정보는 null로 반환
