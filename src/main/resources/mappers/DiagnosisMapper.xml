@@ -24,7 +24,7 @@
         join ai_model_showcase.tb_prob_info tpi on tpsr.prob_no = tpi.prob_no
         join ai_model_showcase.tb_topic_info tti on tpsr.q_idx = tti.q_idx
         where tmi.member_no = #{memberNo}
-        order by tpsr.prob_solve_idx desc
+        order by tpsr.chg_dt, tpsr.prob_seq_no asc
         limit 100;
     </select>
 
