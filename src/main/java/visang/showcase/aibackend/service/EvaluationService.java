@@ -302,35 +302,57 @@ public class EvaluationService {
                 .map((prob) -> prob.getProb_no())
                 .collect(Collectors.toList());
 
-        if (after >= EVALUATION_THRESHHOLD && relatedRate >= EVALUATION_THRESHHOLD) { // 실수로 틀린 문항
-            // 틀린문제 문항번호 추출
-            List<Integer> prob_idxs = request.getProb_list()
-                    .stream()
-                    .filter((prob) -> prob.getCorrect() == 0 && prob.getDiff_level() < after) // 오답인 경우
-                    .map((prob) -> prob_nos.indexOf(prob.getProb_no()) + 1)
-                    .collect(Collectors.toList());
-            // 틀린문제가 존재하는 경우
-            result.setMistake_prob(new CheckProbDto(prob_idxs, topicName, after, relatedRate));
-            // 점검해야 하는 문항정보는 null로 반환
-            result.setCheck_prob(new CheckProbDto(new ArrayList<>(), topicName, after, relatedRate));
-        } else if (after < EVALUATION_THRESHHOLD && relatedRate < EVALUATION_THRESHHOLD) { // 점검이 필요한 문항
-            // 맞은문제 문항번호 추출
-            List<Integer> prob_idxs = request.getProb_list()
-                    .stream()
-                    .filter((prob) -> prob.getCorrect() == 1 && prob.getDiff_level() >= after) // 정답인 경우
-                    .map((prob) -> prob_nos.indexOf(prob.getProb_no()) + 1)
-                    .collect(Collectors.toList());
-            // 맞은문제가 존재하는 경우
-            result.setCheck_prob(new CheckProbDto(prob_idxs, topicName, after, relatedRate));
-            // 실수로 틀린 문항정보는 null로 반환
-            result.setMistake_prob(new CheckProbDto(new ArrayList<>(), topicName, after, relatedRate));
-        } else { // 둘 다 해당 안될 경우, 빈 리스트 반환
+        // 난이도2 분수 자연수
 
-            // 맞은문제가 존재하는 경우
-            result.setCheck_prob(new CheckProbDto(new ArrayList<>(), topicName, after, relatedRate));
-            // 실수로 틀린 문항정보는 null로 반환
-            result.setMistake_prob(new CheckProbDto(new ArrayList<>(), topicName, after, relatedRate));
+        List<Integer> mistake_prob_idx_list = new ArrayList<>(); // 실수로 틀린 문항 idx
+        List<Integer> check_prob_idx_list = new ArrayList<>(); // 점검 필요한 문항 idx
+
+        // 문항들 순회하면서 실수, 점검 문항 체크
+
+        List<EvaluationProbRequest> probList = request.getProb_list();
+
+        for (EvaluationProbRequest probData : probList) {
+            if (after >= probData.getDiff_level() && probData.getCorrect() == 0){ // 학습 후 지식 수준이 문제 난이도보다 높은 데 틀린 경우 -> 실수
+                System.out.println("실수");
+                mistake_prob_idx_list.add(prob_nos.indexOf(probData.getProb_no()) + 1);
+            } else if (after < probData.getDiff_level() && probData.getCorrect() == 1) { // 학습 후 지식 수준이 문제 난이도보다 낮은 데 맞은 경우 -> 점검
+                System.out.println("점검");
+                check_prob_idx_list.add(prob_nos.indexOf(probData.getProb_no()) + 1);
+            }
         }
+
+        result.setMistake_prob(new CheckProbDto(mistake_prob_idx_list, topicName, after, relatedRate));
+        result.setCheck_prob(new CheckProbDto(check_prob_idx_list, topicName, after, relatedRate));
+
+//        if (after >= EVALUATION_THRESHHOLD && relatedRate >= EVALUATION_THRESHHOLD) { // 실수로 틀린 문항
+//            // 틀린문제 문항번호 추출
+//            List<Integer> prob_idxs = request.getProb_list()
+//                    .stream()
+//                    .filter((prob) -> prob.getCorrect() == 0 && prob.getDiff_level() < after) // 오답인 경우
+//                    .map((prob) -> prob_nos.indexOf(prob.getProb_no()) + 1)
+//                    .collect(Collectors.toList());
+//            // 틀린문제가 존재하는 경우
+//            result.setMistake_prob(new CheckProbDto(prob_idxs, topicName, after, relatedRate));
+//            // 점검해야 하는 문항정보는 null로 반환
+//            result.setCheck_prob(new CheckProbDto(new ArrayList<>(), topicName, after, relatedRate));
+//        } else if (after < EVALUATION_THRESHHOLD && relatedRate < EVALUATION_THRESHHOLD) { // 점검이 필요한 문항
+//            // 맞은문제 문항번호 추출
+//            List<Integer> prob_idxs = request.getProb_list()
+//                    .stream()
+//                    .filter((prob) -> prob.getCorrect() == 1 && prob.getDiff_level() >= after) // 정답인 경우
+//                    .map((prob) -> prob_nos.indexOf(prob.getProb_no()) + 1)
+//                    .collect(Collectors.toList());
+//            // 맞은문제가 존재하는 경우
+//            result.setCheck_prob(new CheckProbDto(prob_idxs, topicName, after, relatedRate));
+//            // 실수로 틀린 문항정보는 null로 반환
+//            result.setMistake_prob(new CheckProbDto(new ArrayList<>(), topicName, after, relatedRate));
+//        } else { // 둘 다 해당 안될 경우, 빈 리스트 반환
+//
+//            // 맞은문제가 존재하는 경우
+//            result.setCheck_prob(new CheckProbDto(new ArrayList<>(), topicName, after, relatedRate));
+//            // 실수로 틀린 문항정보는 null로 반환
+//            result.setMistake_prob(new CheckProbDto(new ArrayList<>(), topicName, after, relatedRate));
+//        }
 
         return result;
     }
