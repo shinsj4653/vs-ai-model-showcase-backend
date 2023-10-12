@@ -316,6 +316,12 @@ public class EvaluationService {
             result.setCheck_prob(new CheckProbDto(prob_idxs, topicName, after, relatedRate));
             // 실수로 틀린 문항정보는 null로 반환
             result.setMistake_prob(new CheckProbDto(new ArrayList<>(), topicName, after, relatedRate));
+        } else { // 둘 다 해당 안될 경우, 빈 리스트 반환
+           
+            // 맞은문제가 존재하는 경우
+            result.setCheck_prob(new CheckProbDto(new ArrayList<>(), topicName, after, relatedRate));
+            // 실수로 틀린 문항정보는 null로 반환
+            result.setMistake_prob(new CheckProbDto(new ArrayList<>(), topicName, after, relatedRate));
         }
 
         return result;
