@@ -69,10 +69,10 @@ public class EvaluationService {
 
         // json 파일 읽기
         // 서버 주소
-        Reader reader = new FileReader("/home/ubuntu/app/ai-model-showcase-backend/src/main/resources/json/topicmap_v0.json");
+        //Reader reader = new FileReader("/home/ubuntu/app/ai-model-showcase-backend/src/main/resources/json/topicmap_v0.json");
 
         // 로컬 주소
-//        Reader reader = new FileReader(System.getProperty("user.dir") + "/src/main/resources/json/topicmap_v0.json");
+        Reader reader = new FileReader(System.getProperty("user.dir") + "/src/main/resources/json/topicmap_v0.json");
 
         JSONObject jsonObject = (JSONObject) parser.parse(reader);
 
@@ -92,7 +92,7 @@ public class EvaluationService {
         topicValues.sort(Comparator.comparingDouble(TopicValue::getValue).reversed());
 
         // 상위 5개만 필요
-        return topicValues.subList(0, 6);
+        return topicValues.subList(0, 5);
     }
 
     // index(토픽idx)와 연관 정도를 담을 객체
@@ -288,9 +288,8 @@ public class EvaluationService {
         for (TopicValue topic : relatedTop5Topics) {
             Double rate = knowledgeRates.get(topic.getIndex());
             relatedTopicKnowledgeRate += rate;
-            relatedTopicKnowledgeRate /= 5;
         }
-
+        relatedTopicKnowledgeRate /= 5;
         Double relatedRate = Double.valueOf(String.format("%.2f", relatedTopicKnowledgeRate));
 
         // 타겟 토픽 전후 지식수준
