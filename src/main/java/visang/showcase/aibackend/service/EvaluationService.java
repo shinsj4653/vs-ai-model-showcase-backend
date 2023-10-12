@@ -69,11 +69,11 @@ public class EvaluationService {
 
         // json 파일 읽기
         // 서버 주소
-        Reader reader = new FileReader("../../home/ubuntu/deploy/ai_model_showcase_backend/src/main/resources/json/topicmap_v0.json");
+        Reader reader = new FileReader("/home/ubuntu/deploy/ai_model_showcase_backend/src/main/resources/json/topicmap_v0.json");
 
         // 로컬 주소
 //        Reader reader = new FileReader(System.getProperty("user.dir") + "/src/main/resources/json/topicmap_v0.json");
-        
+
         JSONObject jsonObject = (JSONObject) parser.parse(reader);
 
         reader.close();
