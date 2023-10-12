@@ -201,6 +201,7 @@ public class DiagnosisService {
         StrongWeakKnowledgeResponse strongWeakKnowledgeResponse = calculateKnowledgeStrength(request, knowledgeRates);
         result.setStrong_level(strongWeakKnowledgeResponse.getStrong_level());
         result.setWeak_level(strongWeakKnowledgeResponse.getWeak_level());
+
         // 앞으로 배울 토픽의 예상 지식 수준
         List<ExpectedTopicResponse> expectedTopics = calculateExpectedKnowledgeLevel(memberNo, request, knowledgeRates);
         result.setFuture_topic_level_expectation(expectedTopics);
@@ -208,12 +209,6 @@ public class DiagnosisService {
         // 지식 맵 html 코드
         String intelligenceMapHtml = diagnosisMapper.getIntelligenceMapHtml(memberNo);
         result.setIntelligence_map_html(intelligenceMapHtml);
-
-        // 타켓 토픽 명
-        Integer tgtTopic = diagnosisMapper.getTgtTopic(memberNo);
-
-        String tgtTopicName = diagnosisMapper.getTgtTopicName(tgtTopic);
-        result.setTgtTopicName(tgtTopicName);
 
         return result;
     }
@@ -438,9 +433,16 @@ public class DiagnosisService {
 
         List<ExpectedTopicResponse> result = new ArrayList<>();
         // 토픽 인덱스 5개에 해당하는 토픽이름 데이터 조회 및 지식수준 추출
-        diagnosisMapper.getTopicNamesWithQIdxs(nextQIdxs)
-                .forEach((row) -> result.add(new ExpectedTopicResponse(row.getTopic_nm(), Double.valueOf(String.format("%.2f", knowledgeRates.get(row.getQ_idx()))))));
+//        diagnosisMapper.getTopicNamesWithQIdxs(nextQIdxs)
+//                .forEach((row) -> result.add(new ExpectedTopicResponse(row.getTopic_nm(), Double.valueOf(String.format("%.2f", knowledgeRates.get(row.getQ_idx()))))));
 
+        // 앞으로 배울 토픽이름 및 지식수준
+        // => 타겟 토픽 지식 수준, 타겟 토픽 명으로 세팅
+        Integer tgtTopic = diagnosisMapper.getTgtTopic(memberNo);
+        Double tgtTopicKnowledgeRate = Double.valueOf(String.format("%.2f", knowledgeRates.get(tgtTopic)));
+        String tgtTopicName = diagnosisMapper.getTgtTopicName(tgtTopic);
+
+        result.add(new ExpectedTopicResponse(tgtTopicName, tgtTopicKnowledgeRate));
         return result;
     }
 }

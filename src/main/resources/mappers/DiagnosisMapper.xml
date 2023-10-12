@@ -55,7 +55,7 @@
     </select>
 
     <select id="getTgtTopicName" resultType="String" fetchSize="1000">
-        select q_nm
+        select topic_nm
         from ai_model_showcase.tb_topic_info tti
         where tti.q_idx = #{qIdx}
     </select>
