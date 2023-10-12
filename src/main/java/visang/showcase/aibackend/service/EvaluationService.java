@@ -53,7 +53,7 @@ public class EvaluationService {
     public List<EvaluationStartDto> getProblems(String memberNo, String token) {
 
         // 현재 지식수준 가져오기
-        Double knowledgeRate = Double.valueOf(String.format("%.3f", transactionMapper.getTgtTopicKnowledgeRate(token)));
+        Double knowledgeRate = Double.valueOf(String.format("%.2f", transactionMapper.getTgtTopicKnowledgeRate(token)));
 
         Integer qIdx = diagnosisMapper.getTgtTopic(memberNo);
         return evaluationMapper.getProblems(qIdx).stream()
@@ -207,11 +207,11 @@ public class EvaluationService {
                 .getTopic_nm();
 
         // 진단평가 직후의 타겟토픽 지식수준
-        Double before = transactionMapper.getTgtTopicKnowledgeRate(token);
+        Double before = Double.valueOf(String.format("%.2f", transactionMapper.getTgtTopicKnowledgeRate(token)));
 
         // 형성평가 이후의 타겟토픽 지식수준
         Integer tgtTopic = diagnosisMapper.getTgtTopic(memberNo);
-        Double after = knowledgeRates.get(tgtTopic);
+        Double after = Double.valueOf(String.format("%.2f", knowledgeRates.get(tgtTopic)));
 
         // 타겟 토픽 전후 지식수준
         result.setTopic_level_change(new TopicLevelChangeDto(before, after));
@@ -450,7 +450,7 @@ public class EvaluationService {
                 .getData();
         // 바뀐 지식추론값 반환
         Integer tgtTopic = diagnosisMapper.getTgtTopic(memberNo);
-        Double newKnowledgeRate = Double.valueOf(String.format("%.3f", knowledgeRates.get(tgtTopic)));
+        Double newKnowledgeRate = Double.valueOf(String.format("%.2f", knowledgeRates.get(tgtTopic)));
 
         return new EvaluationContinueDto(token, newKnowledgeRate, nextProblem);
     }
