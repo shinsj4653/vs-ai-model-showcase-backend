@@ -485,10 +485,10 @@ public class EvaluationService {
 
             // 해당 타켓 토픽에서 이미 가장 높은 난이도면, 동일한 난이도에서 문제 가져오기
             // 새로운 난이도 있는 경우, 업데이트 된 난이도에서 문제 가져오기
-            if (diffLevelIdx + 1 == diffLevelList.size()) {
-                newProblems = probMap.get(diffLevelList.get(diffLevelIdx));
-            } else {
+            if (diffLevelList.contains(diffLevelIdx + 1)) {
                 newProblems = probMap.get(diffLevelList.get(diffLevelIdx + 1));
+            } else{
+                newProblems = probMap.get(diffLevelList.get(diffLevelIdx));
             }
 
         } else { // 틀렸을 경우
@@ -504,6 +504,7 @@ public class EvaluationService {
         }
 
         EvaluationProblemDto result = null;
+        Collections.shuffle(newProblems);
 
         // 문항 리스트 중, 이전 문제와 중복되지 않는 문제 반환
         for (EvaluationProblemDto newProblem : newProblems) {
