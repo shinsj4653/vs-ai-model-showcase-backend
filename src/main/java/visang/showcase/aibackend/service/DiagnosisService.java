@@ -42,6 +42,11 @@ public class DiagnosisService {
 
     // 100개의 문제에 해당하는 category_cd
     private Set<String> categories;
+
+    // 타깃 토픽에 해당하는 영역들의 category_cd
+    private Set<String> categoriesWithArea;
+
+
     // category_cd와 category_nm 매핑
     private Map<String, String> categoryNames = new HashMap<>();
     // q_Idx와 topic_nm 매핑
@@ -58,11 +63,6 @@ public class DiagnosisService {
         return diagnosisMapper.getProblems(memberNo)
                 .subList(85, 100);
     }
-
-    /**
-     * 타켓 토픽에 해당하는 subject_cd 에 해당하는 categ_nm 구하기
-     */
-    public List<String getCategoryNm
 
     /**
      * category_cd를 저장할 Set 생성
@@ -195,7 +195,7 @@ public class DiagnosisService {
         List<TopicCorrectRate> topicCorrectRates = calculateTopicCorrectRates(request);
         result.setTopic_answer_result(topicCorrectRates);
         // 영역별 지식수준 계산
-        List<AreaKnowledgeResponse> areaKnowledgeResponses = calculateAreaKnowledgeLevel(knowledgeRates);
+        List<AreaKnowledgeResponse> areaKnowledgeResponses = calculateAreaKnowledgeLevel(memberNo, knowledgeRates);
         result.setSection_level(areaKnowledgeResponses);
         // 강약 지식요인 계산
         StrongWeakKnowledgeResponse strongWeakKnowledgeResponse = calculateKnowledgeStrength(request, knowledgeRates);
@@ -307,23 +307,65 @@ public class DiagnosisService {
      * @param knowledgeRates 트리톤 서버에서 받은 지식수준 추론 결과
      * @return List<AreaKnowledgeResponse> 반환
      */
-    private List<AreaKnowledgeResponse> calculateAreaKnowledgeLevel(List<Double> knowledgeRates) {
+    private List<AreaKnowledgeResponse> calculateAreaKnowledgeLevel(String memberNo, List<Double> knowledgeRates) {
         List<AreaKnowledgeResponse> areaKnowledges = new ArrayList<>();
-        // 영역 셋을 순환하면서 영역
-        for (String categoryCode : categories) {
-            List<Integer> qIdxs = diagnosisMapper.getQIdxWithCategory(categoryCode);
-            // 영역에 해당하는 토픽들의 지식수준의 합계 계산
-            Double sum = qIdxs.stream()
-                    .map(qIdx -> knowledgeRates.get(qIdx))
+
+        // 학생에 해당하는 영역 카테고리 정보
+        List<AreaCategoryDto> categoriesWithMemberNo = diagnosisMapper.getCategoriesWithMemberNo(memberNo);
+        Map<String, List<AreaCategoryDto>> categoryMap = categoriesWithMemberNo.stream()
+                .collect(Collectors.groupingBy(AreaCategoryDto::getCateg_nm));
+
+
+        for (String s : categoryMap.keySet()) {
+            List<AreaCategoryDto> areaCategoryDtos = categoryMap.get(s);
+            Double sum = areaCategoryDtos.stream()
+                    .map(dto -> knowledgeRates.get(dto.getQ_idx()))
                     .collect(reducing(Double::sum))
                     .get();
-            // 지식수준의 평균 계산
-            Double avg = sum / qIdxs.size();
+
+           // 지식수준의 평균 계산
+             Double avg = sum / areaCategoryDtos.size();
             // 소수점 셋째자리까지 반올림
             Double knowledgeLevel = Double.valueOf(String.format("%.2f", avg));
 
-            areaKnowledges.add(new AreaKnowledgeResponse(categoryNames.get(categoryCode), knowledgeLevel, "진단평가"));
+            areaKnowledges.add(new AreaKnowledgeResponse(s, knowledgeLevel, "진단평가"));
+
         }
+
+//        for (int i = 0; i < categoryMap.size() - 1; i++) {
+//            List<AreaCategoryDto> areaCategoryDtos = categoryMap.get(i);
+//            Double sum = areaCategoryDtos.stream()
+//                    .map(dto -> knowledgeRates.get(dto.getQIdx()))
+//                    .collect(reducing(Double::sum))
+//                    .get();
+//
+//            for (AreaCategoryDto areaCategoryDto : areaCategoryDtos) {
+//                sum += knowledgeRates.get(areaCategoryDto.getQIdx());
+//            }
+//
+//            // 지식수준의 평균 계산
+//            Double avg = sum / areaCategoryDtos.size();
+//            // 소수점 셋째자리까지 반올림
+//            Double knowledgeLevel = Double.valueOf(String.format("%.2f", avg));
+//
+//            areaKnowledges.add(new AreaKnowledgeResponse(categoryMap., knowledgeLevel, "진단평가"));
+//        }
+
+        // 영역 셋을 순환하면서 영역
+//        for (AreaCategoryDto categ : categoriesWithMemberNo) {
+//            List<Integer> qIdxs = diagnosisMapper.getQIdxWithCategory();
+//            // 영역에 해당하는 토픽들의 지식수준의 합계 계산
+//            Double sum = qIdxs.stream()
+//                    .map(qIdx -> knowledgeRates.get(qIdx))
+//                    .collect(reducing(Double::sum))
+//                    .get();
+//            // 지식수준의 평균 계산
+//            Double avg = sum / qIdxs.size();
+//            // 소수점 셋째자리까지 반올림
+//            Double knowledgeLevel = Double.valueOf(String.format("%.2f", avg));
+//
+//            areaKnowledges.add(new AreaKnowledgeResponse(categoryNames.get(categoryCode), knowledgeLevel, "진단평가"));
+//        }
 
         return areaKnowledges;
     }

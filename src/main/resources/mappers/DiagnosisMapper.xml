@@ -66,14 +66,20 @@
     </select>
 
     <!-- 타켓 토픽, subject_cd에 해당하는 categ_nm 뽑아오기 -->
-    <select id="getCategoryNames" resultType="String" fetchSize="1000">
-        select distinct categ_nm
-        from ai_model_showcase.tb_topic_info tti
-        where tti.subject_cd in (
-            select subject_cd
-            from ai_model_showcase.tb_topic_info tti
-            where tti.q_idx = #{qIdx}
-        );
+    <select id="getCategoriesWithMemberNo" resultType="AreaCategoryDto" fetchSize="1000">
+        with tb_categ as (select tti2.subject_cd , tti2.categ_cd , tti2.categ_nm
+                        from ai_model_showcase.tb_topic_info tti2
+                        where tti2.subject_cd = (
+                            select tti.subject_cd
+                            from ai_model_showcase.tb_member_info tmi
+                            join ai_model_showcase.tb_topic_info tti on tmi.tgt_topic = tti.q_idx
+                            where tmi.member_no = #{memberNo}
+                  )
+                  group by tti2.subject_cd , tti2.categ_cd , tti2.categ_nm)
+
+            select tti.q_idx , tti.categ_cd , tti.categ_nm
+            from tb_categ tc
+            join ai_model_showcase.tb_topic_info tti on tti.categ_cd = tc.categ_cd;
     </select>
 
     <!-- GET intelligence_map_html -->

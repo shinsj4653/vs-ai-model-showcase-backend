@@ -3,6 +3,7 @@ package visang.showcase.aibackend.mapper;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 import visang.showcase.aibackend.dto.response.diagnosis.DiagnosisProblemDto;
+import visang.showcase.aibackend.dto.response.diagnosis.dashboard.AreaCategoryDto;
 import visang.showcase.aibackend.dto.response.diagnosis.dashboard.TopicInfoRow;
 
 import java.util.List;
@@ -19,6 +20,6 @@ public interface DiagnosisMapper {
 
     String getIntelligenceMapHtml(@Param("memberNo") String memberNo);
 
-    List<String> getCategoryNames(@Param("qIdx") Integer qIdx);
+    List<AreaCategoryDto> getCategoriesWithMemberNo(@Param("memberNo") String memberNo);
 
 }
