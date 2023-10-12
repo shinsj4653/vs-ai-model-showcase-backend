@@ -1,9 +1,14 @@
 package visang.showcase.aibackend.service;
 
+import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.util.JSONPObject;
 import lombok.RequiredArgsConstructor;
+import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
+import org.json.simple.parser.ParseException;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 import visang.showcase.aibackend.dto.request.evaluation.EvaluationDashboardRequest;
@@ -26,6 +31,10 @@ import visang.showcase.aibackend.mapper.DiagnosisMapper;
 import visang.showcase.aibackend.mapper.EvaluationMapper;
 import visang.showcase.aibackend.mapper.TransactionMapper;
 
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
+import java.io.Reader;
 import java.sql.SQLOutput;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -45,6 +54,57 @@ public class EvaluationService {
     private final DiagnosisMapper diagnosisMapper;
     private final TransactionMapper transactionMapper;
     private final ObjectMapper objectMapper;
+
+    /**
+     * 연관토픽 구하는 로직
+     */
+    private List<TopicValue> getRelatedKnowledgeRate(Integer tgtTopicIdx) throws IOException, ParseException {
+
+        JSONParser parser = new JSONParser();
+
+        System.out.println(System.getProperty("user.dir"));
+
+        // json 파일 읽기
+        Reader reader = new FileReader(System.getProperty("user.dir") + "/src/main/resources/json/topicmap_v0.json");
+        JSONObject jsonObject = (JSONObject) parser.parse(reader);
+
+        reader.close();
+        
+        // 연관 토픽 맵
+        List<List<Double>> map = (List<List<Double>>) jsonObject.get("map");
+
+        // 타켓 토픽에 해당되는 연관도 라인 가져와서 내림차순 정렬
+        List<Double> tgtTopicLine = map.get(1);
+        List<TopicValue> topicValues = new ArrayList<>();
+
+        for (int i = 0; i < tgtTopicLine.size(); i++) {
+            Double value = tgtTopicLine.get(i);
+            topicValues.add(new TopicValue(i, value));
+        }
+        topicValues.sort(Comparator.comparingDouble(TopicValue::getValue).reversed());
+
+        // 상위 5개만 필요
+        return topicValues.subList(0, 6);
+    }
+
+    // index(토픽idx)와 연관 정도를 담을 객체
+    public class TopicValue {
+        private int index;
+        private double value;
+
+        public TopicValue(int index, double value) {
+            this.index = index;
+            this.value = value;
+        }
+
+        public int getIndex() {
+            return index;
+        }
+
+        public double getValue() {
+            return value;
+        }
+    }
 
     /**
      * 형성평가 문항 5개 조회
@@ -189,7 +249,7 @@ public class EvaluationService {
      * @param request RequestBody 데이터
      * @return EvaluationDashboardResult 반환
      */
-    public EvaluationDashboardResult getDashboardResult(String memberNo, EvaluationDashboardRequest request, String token){
+    public EvaluationDashboardResult getDashboardResult(String memberNo, EvaluationDashboardRequest request, String token) throws IOException, ParseException {
         EvaluationDashboardResult result = new EvaluationDashboardResult();
 
         // 형성평가 문항들을 누적하여 지식수준 재추론
@@ -213,6 +273,18 @@ public class EvaluationService {
         Integer tgtTopic = diagnosisMapper.getTgtTopic(memberNo);
         Double after = Double.valueOf(String.format("%.2f", knowledgeRates.get(tgtTopic)));
 
+        // 타켓 토픽과 연관된 토픽들의 지식수준의 평균값
+        List<TopicValue> relatedTop5Topics = getRelatedKnowledgeRate(tgtTopic);
+        Double relatedTopicKnowledgeRate = 0.0;
+
+        for (TopicValue topic : relatedTop5Topics) {
+            Double rate = knowledgeRates.get(topic.getIndex());
+            relatedTopicKnowledgeRate += rate;
+            relatedTopicKnowledgeRate /= 5;
+        }
+
+        Double relatedRate = Double.valueOf(String.format("%.2f", relatedTopicKnowledgeRate));
+
         // 타겟 토픽 전후 지식수준
         result.setTopic_level_change(new TopicLevelChangeDto(before, after));
 
@@ -222,7 +294,7 @@ public class EvaluationService {
                 .map((prob) -> prob.getProb_no())
                 .collect(Collectors.toList());
 
-        if (after >= EVALUATION_THRESHHOLD) { // 실수로 틀린 문항
+        if (after >= EVALUATION_THRESHHOLD && relatedRate >= EVALUATION_THRESHHOLD) { // 실수로 틀린 문항
             // 틀린문제 문항번호 추출
             List<Integer> prob_idxs = request.getProb_list()
                     .stream()
@@ -230,10 +302,10 @@ public class EvaluationService {
                     .map((prob) -> prob_nos.indexOf(prob.getProb_no()) + 1)
                     .collect(Collectors.toList());
             // 틀린문제가 존재하는 경우
-            result.setMistake_prob(new CheckProbDto(prob_idxs, topicName, after));
+            result.setMistake_prob(new CheckProbDto(prob_idxs, topicName, after, relatedRate));
             // 점검해야 하는 문항정보는 null로 반환
-            result.setCheck_prob(new CheckProbDto(new ArrayList<>(), topicName, after));
-        } else { // 점검이 필요한 문항
+            result.setCheck_prob(new CheckProbDto(new ArrayList<>(), topicName, after, relatedRate));
+        } else if (after < EVALUATION_THRESHHOLD && relatedRate < EVALUATION_THRESHHOLD) { // 점검이 필요한 문항
             // 맞은문제 문항번호 추출
             List<Integer> prob_idxs = request.getProb_list()
                     .stream()
@@ -241,9 +313,9 @@ public class EvaluationService {
                     .map((prob) -> prob_nos.indexOf(prob.getProb_no()) + 1)
                     .collect(Collectors.toList());
             // 맞은문제가 존재하는 경우
-            result.setCheck_prob(new CheckProbDto(prob_idxs, topicName, after));
+            result.setCheck_prob(new CheckProbDto(prob_idxs, topicName, after, relatedRate));
             // 실수로 틀린 문항정보는 null로 반환
-            result.setMistake_prob(new CheckProbDto(new ArrayList<>(), topicName, after));
+            result.setMistake_prob(new CheckProbDto(new ArrayList<>(), topicName, after, relatedRate));
         }
 
         return result;

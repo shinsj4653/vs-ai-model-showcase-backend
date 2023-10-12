@@ -1,6 +1,7 @@
 package visang.showcase.aibackend.controller;
 
 import lombok.RequiredArgsConstructor;
+import org.json.simple.parser.ParseException;
 import org.springframework.web.bind.annotation.*;
 import visang.showcase.aibackend.dto.request.evaluation.EvaluationDashboardRequest;
 import visang.showcase.aibackend.dto.request.evaluation.EvaluationNextProbRequest;
@@ -15,6 +16,7 @@ import visang.showcase.aibackend.dto.response.evaluation.dashboard.EvaluationDas
 import visang.showcase.aibackend.service.EvaluationService;
 import visang.showcase.aibackend.util.JwtTokenProvider;
 
+import java.io.IOException;
 import java.util.List;
 
 @RestController
@@ -33,7 +35,7 @@ public class EvaluationController {
     }
 
     @PostMapping("/dashboard")
-    public ResponseDto<EvaluationDashboardResult> getEvaluationDashboardResults(@RequestBody EvaluationDashboardRequest request){
+    public ResponseDto<EvaluationDashboardResult> getEvaluationDashboardResults(@RequestBody EvaluationDashboardRequest request) throws IOException, ParseException {
 
         String token = request.getTransaction_token();
         String memberNo = jwtTokenProvider.getMemberNo(token);

@@ -12,5 +12,6 @@ public class CheckProbDto {
     private List<Integer> prob_seq_no;
     private String topic_nm;
     private Double topic_level;
+    private Double related_topic_level;
 //    private Double relation_topic_level;
 }
