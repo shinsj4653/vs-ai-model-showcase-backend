@@ -53,7 +53,7 @@ public class EvaluationService {
     public List<EvaluationStartDto> getProblems(String memberNo, String token) {
 
         // 현재 지식수준 가져오기
-        Double knowledgeRate = transactionMapper.getTgtTopicKnowledgeRate(token);
+        Double knowledgeRate = Double.valueOf(String.format("%.3f", transactionMapper.getTgtTopicKnowledgeRate(token)));
 
         Integer qIdx = diagnosisMapper.getTgtTopic(memberNo);
         return evaluationMapper.getProblems(qIdx).stream()
@@ -450,7 +450,7 @@ public class EvaluationService {
                 .getData();
         // 바뀐 지식추론값 반환
         Integer tgtTopic = diagnosisMapper.getTgtTopic(memberNo);
-        Double newKnowledgeRate = knowledgeRates.get(tgtTopic);
+        Double newKnowledgeRate = Double.valueOf(String.format("%.3f", knowledgeRates.get(tgtTopic)));
 
         return new EvaluationContinueDto(token, newKnowledgeRate, nextProblem);
     }
