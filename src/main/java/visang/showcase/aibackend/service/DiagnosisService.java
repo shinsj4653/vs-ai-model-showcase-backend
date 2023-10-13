@@ -61,7 +61,7 @@ public class DiagnosisService {
      */
     public List<DiagnosisProblemDto> getProblems(String memberNo) {
         return diagnosisMapper.getProblems(memberNo)
-                .subList(0, 15);
+                .subList(85, 100);
     }
 
     /**
@@ -102,7 +102,7 @@ public class DiagnosisService {
      */
     private KnowledgeLevelRequest createTritonRequest(String memberNo, DiagnosisDashboardRequest request, String token) {
 
-        List<DiagnosisProblemDto> preList = diagnosisMapper.getProblems(memberNo).subList(15, 100);
+        List<DiagnosisProblemDto> preList = diagnosisMapper.getProblems(memberNo).subList(0, 85);
 
         // 앞의 85문제 + 학생 진단 후의 15문제 => 총 100 문제
         List<DiagnosisProblemDto> mergedList = Stream.of(preList, request.getProb_list())
