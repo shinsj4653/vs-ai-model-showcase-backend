@@ -506,9 +506,9 @@ public class EvaluationService {
 
             // 해당 타켓 토픽에서 이미 가장 높은 난이도면, 동일한 난이도에서 문제 가져오기
             // 새로운 난이도 있는 경우, 업데이트 된 난이도에서 문제 가져오기
-            if (diffLevelIdx == diffLevelList.size() - 1) { // 마지막이 아닌 상황 == 다음 난이도를 가져와야 하는 상황
+            if (diffLevelIdx == diffLevelList.size() - 1) { // 맨 끝 난이도에 있는 상황
                 newProblems = probMap.get(diffLevelList.get(diffLevelIdx));
-            } else{ // 맨 끝 난이도에 있는 상황
+            } else{ // 마지막인 상황 == 다음 난이도를 가져와야 하는 상황
                 newProblems = probMap.get(diffLevelList.get(diffLevelIdx + 1));
             }
 
@@ -524,24 +524,24 @@ public class EvaluationService {
 
         }
 
-        EvaluationProblemDto result = null;
+        //EvaluationProblemDto result = null;
         Collections.shuffle(newProblems);
 
         // 문항 리스트 중, 이전 문제와 중복되지 않는 문제 반환
-        for (EvaluationProblemDto newProblem : newProblems) {
-            if (Integer.parseInt(newProblem.getProb_no()) > Integer.parseInt(request.getProb_no())) {
-                result = newProblem;
-                break;
-            }
-
-        }
+//        for (EvaluationProblemDto newProblem : newProblems) {
+//            if (Integer.parseInt(newProblem.getProb_no()) > Integer.parseInt(request.getProb_no())) {
+//                result = newProblem;
+//                break;
+//            }
+//
+//        }
 
         // 만약 난이도 내에서 마지막 문항일 시, 해당 난이도의 첫 문항을 반환
-        if (result == null) {
-            result = newProblems.get(0);
-        }
+//        if (result == null) {
+//            result = newProblems.get(0);
+//        }
 
-        return result;
+        return newProblems.get(0);
     }
 
     public EvaluationContinueDto getNextProblem(String token, String memberNo, EvaluationNextProbRequest request) {
