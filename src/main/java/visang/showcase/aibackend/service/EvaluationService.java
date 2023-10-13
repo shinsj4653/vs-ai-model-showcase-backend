@@ -506,9 +506,9 @@ public class EvaluationService {
 
             // 해당 타켓 토픽에서 이미 가장 높은 난이도면, 동일한 난이도에서 문제 가져오기
             // 새로운 난이도 있는 경우, 업데이트 된 난이도에서 문제 가져오기
-            if (diffLevelList.contains(diffLevelIdx + 1)) {
+            if (diffLevelIdx == diffLevelList.size() - 1) { // 마지막이 아닌 상황 == 다음 난이도를 가져와야 하는 상황
                 newProblems = probMap.get(diffLevelList.get(diffLevelIdx + 1));
-            } else{
+            } else{ // 맨 끝 난이도에 있는 상황
                 newProblems = probMap.get(diffLevelList.get(diffLevelIdx));
             }
 
