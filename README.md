@@ -180,15 +180,22 @@ recommend_num = 5
 ```
 진단평가 단계 이후에 쌓인 `문제 풀이 이력들 및 타겟 토픽`을 입력값으로 줄 시, `타겟 토픽의 지식수준을 올려줄 추천 연관 토픽들`과 `해당 토픽들의 문제를 풀었을 때 바뀔 지식 수준 값을 반환`해줌
  
-### 채택 방식
+### 채택 방식 및 트리톤을 활용한 모델 서빙
 - 수학 문제 추천 및 지식 수준 도출 -> GKT 변형 방식인 `TOKT(Target Oriented Knowledge Tracing)` 기법을 사용
 - TOKT 모델의 추론 결과를 웹에서 볼 수 있는 형태로 가공하기 위해 `NVIDIA Triton 서버`를 사용하여 HTTP 요청을 주고 받을 수 있도록 세팅
 
 ![image](https://github.com/shinsj4653/vs-ai-model-showcase-backend/assets/49470452/62e82424-670d-4986-9acd-67211dac521e)
 
 *Triton의 아키텍쳐*  
+트리톤으로 모델 서빙을 위해 다음 절차가 필요하다.  
+1. 서버를 세팅
+- 저희 부서 같은 경우 AWS EC2 인스턴스에 세팅함. GPU 타입의 인스턴스에서 머신러닝 작업을 하기 위해 필요한 `AMI` 를 설치함
+2. Model Repository 생성 후, 서빙할 모델 파일들을 이곳에 저장
+3. Nvidia Cloud에서 제공하는 Triton 서버 이미지를 서버에서 `docker run` 을 함
+4. Triton 서버를 launch 한다.
+5. Triton 서버에 추론 요청을 보
 
-참고링크 - https://peaceatlast.tistory.com/25
+참고링크 - https://peaceatlast.tistory.com/25  
 
 ## TOKT 모델의 지식 추천 기반 코스웨어
 
