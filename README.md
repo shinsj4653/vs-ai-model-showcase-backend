@@ -184,6 +184,12 @@ recommend_num = 5
 - 수학 문제 추천 및 지식 수준 도출 -> GKT 변형 방식인 `TOKT(Target Oriented Knowledge Tracing)` 기법을 사용
 - TOKT 모델의 추론 결과를 웹에서 볼 수 있는 형태로 가공하기 위해 `NVIDIA Triton 서버`를 사용하여 HTTP 요청을 주고 받을 수 있도록 세팅
 
+![image](https://github.com/shinsj4653/vs-ai-model-showcase-backend/assets/49470452/62e82424-670d-4986-9acd-67211dac521e)
+
+*Triton의 아키텍쳐*  
+
+참고링크 - https://peaceatlast.tistory.com/25
+
 ## TOKT 모델의 지식 추천 기반 코스웨어
 
 1. 진단평가
