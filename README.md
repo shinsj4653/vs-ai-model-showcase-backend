@@ -155,7 +155,7 @@ recommend_num = 5
         {
             "name": "INPUT__3",
             "datatype": "INT64",
-            "shape": [batch_size, 5], // seq_len은 5로 고정
+            "shape": [batch_size, 5], # seq_len은 5로 고정
             "data": [[1, 2, 3, 4, 5],
                      [1, 2, 3, 4, 5]]
         }
@@ -168,8 +168,8 @@ recommend_num = 5
             "name": "OUTPUT__0", # output1을 풀었을떄 타겟의 지식수준이 바뀐 후의 확률(output0)
             "datatype": "FP32",
             "shape": [batch_size, recommend_num],
-            "data": [[0.1, 0.2, 0.3, 0.4, 0.5],
-                      [0.1, 0.2, 0.3, 0.4, 0.5]]
+            "data": [[4.4, 4.5, 5.3, 5.4, 6.5],
+                      [3.1, 5.2, 4.3, 5.4, 6.5]]
         },
         {
             "name": "OUTPUT__1",
