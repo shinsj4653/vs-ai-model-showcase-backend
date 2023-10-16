@@ -53,28 +53,28 @@ seq_len = 10 # 입력 시퀀스 길이 -> 문항 수
 num_q = 317 # 토픽 수
 
 # 입력 데이터
-# INPUT__0: 문항번호
+# INPUT__0: 문항번호 (토픽번호)
 # INPUT__1: 정답여부
 # INPUT__2: 난이도
 
 {
     "inputs": [
         {
-            "name": "INPUT__0",
+            "name": "INPUT__0", # 토픽번호
             "datatype": "INT64",
             "shape": [batch_size, seq_len],
             "data": [[0, 1, 2, 3, 4, 5, 6, 7, 8, 9],
                      [10, 11, 12, 13, 14, 15, 16, 17, 18, 19]]
         },
         {
-            "name": "INPUT__1",
+            "name": "INPUT__1", # 정답여부
             "datatype": "INT64",
             "shape": [batch_size, seq_len],
             "data": [[0,0,1,0, 1,0,0,1,0,0],
                      [0,0,1,0, 1,0,0,1,0,0]]
         },
         {
-            "name": "INPUT__2",
+            "name": "INPUT__2", # 난이도
             "datatype": "INT64",
             "shape": [batch_size, seq_len],
             "data": [[2, 4, 3, 3, 2, 4, 5, 5, 5, 5],
@@ -88,7 +88,7 @@ num_q = 317 # 토픽 수
 {
     "outputs": [
         {
-            "name": "OUTPUT__0",
+            "name": "OUTPUT__0", # 각 토픽에 대한 지식수준(확률) 값
             "datatype": "FP32",
             "shape": [batch_size, num_q],
             "data": [[4.1, ... 3.5],
@@ -132,28 +132,28 @@ recommend_num = 5
 {
     "inputs": [
         {
-            "name": "INPUT__0",
+            "name": "INPUT__0", # 토픽번호
             "datatype": "INT64",
             "shape": [batch_size, seq_len],
             "data": [[0, 1, 2, 3, 4, 5, 6, 7, 8, 9],
                      [10, 11, 12, 13, 14, 15, 16, 17, 18, 19]]
         },
         {
-            "name": "INPUT__1",
+            "name": "INPUT__1", # 정답여부
             "datatype": "INT64",
             "shape": [batch_size, seq_len],
             "data": [[0,0,1,0, 1,0,0,1,0,0],
                      [0,0,1,0, 1,0,0,1,0,0]]
         },
         {
-            "name": "INPUT__2",
+            "name": "INPUT__2", # 난이도
             "datatype": "INT64",
             "shape": [batch_size, seq_len],
             "data": [[2, 4, 3, 3, 2, 4, 5, 5, 5, 5],
                      [3, 2, 1, 3, 4, 8, 1, 9, 2, 7]]
         },
         {
-            "name": "INPUT__3",
+            "name": "INPUT__3", # [타겟 토픽 인덱스, 지식맵 깊이, 문항을 연속으로 맞춘 횟수, 추천할 문항 난이도, 추천할 문항 수]
             "datatype": "INT64",
             "shape": [batch_size, 5], # seq_len은 5로 고정
             "data": [[1, 2, 3, 4, 5],
@@ -172,7 +172,7 @@ recommend_num = 5
                       [3.1, 5.2, 4.3, 5.4, 6.5]]
         },
         {
-            "name": "OUTPUT__1",
+            "name": "OUTPUT__1", # 학습준비에 추천하는 토픽 5개
             "datatype": "INT64",
             "shape": [batch_size, recommend_num],
             "data": [[0, 1, 2, 3, 4],
