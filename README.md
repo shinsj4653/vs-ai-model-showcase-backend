@@ -10,6 +10,7 @@
 - [사용 기술 스택](#사용-기술-스택)
 - [ERD](#erd)
 - [수학 지식 추적 모델](#수학-지식-추적-모델)
+- [모델에 사용된 이론 및 트리톤을 활용한 모델 서빙](#모델에-사용된-이론-및-트리톤을-활용한-모델-서빙)
 - [TOKT 모델의 지식 추천 기반 코스웨어](#TOKT-모델의-지식-추천-기반-코스웨어)
 - [나의 주요 구현 기능](#나의-주요-구현-기능)
   * [1. CI/CD 환경 구축](#1-CI/CD-환경-구축)
@@ -23,6 +24,7 @@
 - `Database` : PostgreSQL 42.5.0, AWS RDS
 - `Deploy` : Github Actions, AWS S3 & CodeDeploy
 - `JWT` : Json Web Token
+- `AI Model Serve` : Nvidia Triton Server
 
 ## ERD
 ![image](https://github.com/shinsj4653/vs-ai-model-showcase-backend/assets/49470452/319a9d68-9fb7-4b4b-bafb-ec695b3b3512)
@@ -33,7 +35,7 @@
 지식추적에는 2가지 기법 존재
 - 지식간 독립 기법
   - 지식이 다른 지식에 영향을 미치지 않는 것
-- 지식간 의존 기법
+- `지식간 의존 기법`
   - 맞고 틀림의 여부로 식을 만들고, N개의 데이터로 N + 1 의 맞춤 여부를 예측
  
 ### 지식 수준 모델
@@ -180,9 +182,12 @@ recommend_num = 5
 ```
 진단평가 단계 이후에 쌓인 `문제 풀이 이력들 및 타겟 토픽`을 입력값으로 줄 시, `타겟 토픽의 지식수준을 올려줄 추천 연관 토픽들`과 `해당 토픽들의 문제를 풀었을 때 바뀔 지식 수준 값을 반환`해줌
  
-### 채택 방식 및 트리톤을 활용한 모델 서빙
-- 수학 문제 추천 및 지식 수준 도출 -> GKT 변형 방식인 `TOKT(Target Oriented Knowledge Tracing)` 기법을 사용
-- TOKT 모델의 추론 결과를 웹에서 볼 수 있는 형태로 가공하기 위해 `NVIDIA Triton 서버`를 사용하여 HTTP 요청을 주고 받을 수 있도록 세팅
+## 모델에 사용된 이론 및 트리톤을 활용한 모델 서빙
+- `Deep KT(DKT)` : n번째 문제 직전의 지식 상태에서 n번째 문제 정오답을 입력하고 임베딩된 딥러닝 모델을 거치면 n번째 문제 직후의 지식 상태를 획득하여 활용하는 방식
+- 수학 문제 추천 및 지식 수준 도출 -> DKT 변형 방식인 `GKT(Graph-Based Knowledge Tracing)` 기법을 사용
+- 지식 간 연관된 정도를 나타내는 `지식맵(Knowledge Graph)`을 활용하여 만약 문제를 맞추면 연관된 지식들의 수준이 함께 향상됨
+- 실제 맞춤여부를 확인하는 과정을 무수히 반복하면서 모델을 학습 -> 모든 학생의 데이터로 학습시키려면 많은 시간이 소요되므로, `타겟 학생과 문제 토픽(주제)를 지정하여 학습` 시키는 `목표 지향 지식 추적` 기법을 사용 
+- 비상교육 만의 `TOKT(Target Oriented Knowledge Tracing) 모`의 추론 결과를 웹에서 볼 수 있는 형태로 가공하기 위해 `NVIDIA Triton 서버`를 사용하여 HTTP 요청을 주고 받을 수 있도록 세팅
 
 ![image](https://github.com/shinsj4653/vs-ai-model-showcase-backend/assets/49470452/62e82424-670d-4986-9acd-67211dac521e)
 
