@@ -5,6 +5,7 @@
 ![image](https://github.com/shinsj4653/vs-ai-model-showcase-backend/assets/49470452/79399a88-24ae-416a-8a6f-67cb67a6c17a)
 
 접속 URL : http://13.209.224.148/main/  
+(현재 추론 모델을 중단한 상태여서 진단평가 이후 단계 진행 불가)
 
 ## 목차
 - [사용 기술 스택](#사용-기술-스택)
