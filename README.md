@@ -1,5 +1,5 @@
-﻿# VISANG AI Model Showcase
-## 비상교육 AI 수학 지식 추적 모델 시연 웹 사이트
+﻿# V사 AI Model Showcase
+## V사 AI 수학 지식 추적 모델 시연 웹 사이트
 > 학생의 수학 문제 풀이 데이터를 기반으로 학생이 어느 정도의 난이도의 문제를 해결할 수 있는지에 대한 지식 수준 산출 결과와 해당 학생에게 적합한 문항을 추천해주는 로직을 진단평가 -> 학습준비 -> 형성평가 순으로 보여주는 모델 시연 웹사이트
 
 ![image](https://github.com/shinsj4653/vs-ai-model-showcase-backend/assets/49470452/79399a88-24ae-416a-8a6f-67cb67a6c17a)
@@ -190,7 +190,7 @@ recommend_num = 5
 - 수학 문제 추천 및 지식 수준 도출 -> DKT 변형 방식인 `GKT(Graph-Based Knowledge Tracing)` 기법을 사용
 - 지식 간 연관된 정도를 나타내는 `지식맵(Knowledge Graph)`을 활용하여 만약 문제를 맞추면 연관된 지식들의 수준이 함께 향상됨
 - 실제 맞춤여부를 확인하는 과정을 무수히 반복하면서 모델을 학습 -> 모든 학생의 데이터로 학습시키려면 많은 시간이 소요되므로, `타겟 학생과 문제 토픽(주제)를 지정하여 학습` 시키는 `목표 지향 지식 추적` 기법을 사용 
-- 비상교육 만의 `TOKT(Target Oriented Knowledge Tracing) 모델`의 추론 결과를 웹에서 볼 수 있는 형태로 가공하기 위해 `NVIDIA Triton 서버`를 사용하여 HTTP 요청을 주고 받을 수 있도록 세팅
+- V사 만의 `TOKT(Target Oriented Knowledge Tracing) 모델`의 추론 결과를 웹에서 볼 수 있는 형태로 가공하기 위해 `NVIDIA Triton 서버`를 사용하여 HTTP 요청을 주고 받을 수 있도록 세팅
 
 ![image](https://github.com/shinsj4653/vs-ai-model-showcase-backend/assets/49470452/62e82424-670d-4986-9acd-67211dac521e)
 
